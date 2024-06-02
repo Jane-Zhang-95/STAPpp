@@ -148,8 +148,9 @@ void COutputter::OutputElementInfo()
 		*this << " ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . =" << setw(5)
 			  << ElementType << endl;
 		*this << "     EQ.1, TRUSS ELEMENTS" << endl
-			  << "     EQ.2, ELEMENTS CURRENTLY" << endl
-			  << "     EQ.3, NOT AVAILABLE" << endl
+			  << "     EQ.2, 4-NODE QUADRILATERAL ELEMENTS" << endl
+			  << "     EQ.3, ELEMENTS CURRENTLY" << endl
+			  << "     EQ.4, NOT AVAILABLE" << endl
 			  << endl;
 
 		*this << " NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =" << setw(5) << NUME
@@ -160,6 +161,9 @@ void COutputter::OutputElementInfo()
 		{
 			case ElementTypes::Bar: // Bar element
 				OutputBarElements(EleGrp);
+				break;
+			case ElementTypes::Q4: // Q4 element
+				OutputQ4Elements(EleGrp);
 				break;
 		    default:
 		        *this << ElementType << " has not been implemented yet." << endl;
@@ -209,6 +213,52 @@ void COutputter::OutputBarElements(unsigned int EleGrp)
         *this << setw(5) << Ele+1;
 		ElementGroup[Ele].Write(*this);
     }
+
+	*this << endl;
+}
+
+//	Output Q4 element data
+void COutputter::OutputQ4Elements(unsigned int EleGrp)
+{
+	CDomain* FEMData = CDomain::GetInstance();
+
+	CElementGroup& ElementGroup = FEMData->GetEleGrpList()[EleGrp];
+	unsigned int NUMMAT = ElementGroup.GetNUMMAT();
+
+	*this << " M A T E R I A L   D E F I N I T I O N" << endl
+		<< endl;
+	*this << " NUMBER OF DIFFERENT SETS OF MATERIAL" << endl;
+	*this << " AND PLATE MATERIAL CONSTANTS  . . . .( NPAR(3) ) . . =" << setw(5) << NUMMAT
+		<< endl
+		<< endl;
+
+	*this << "  SET       YOUNG'S         POISSON" << endl
+		<< " NUMBER     MODULUS          RATIO" << endl
+		<< "               E               MU" << endl;
+
+	*this << setiosflags(ios::scientific) << setprecision(5);
+
+	//	Loop over for all property sets
+	for (unsigned int mset = 0; mset < NUMMAT; mset++)
+	{
+		*this << setw(5) << mset + 1;
+		ElementGroup.GetMaterial(mset).Write(*this);
+	}
+
+	*this << endl << endl
+		<< " E L E M E N T   I N F O R M A T I O N" << endl;
+
+	*this << " ELEMENT     NODE     NODE     NODE     NODE       MATERIAL" << endl
+		<< " NUMBER-N      A        B        C        D       SET NUMBER" << endl;
+
+	unsigned int NUME = ElementGroup.GetNUME();
+
+	//	Loop over for all elements in group EleGrp
+	for (unsigned int Ele = 0; Ele < NUME; Ele++)
+	{
+		*this << setw(5) << Ele + 1;
+		ElementGroup[Ele].Write(*this);
+	}
 
 	*this << endl;
 }
@@ -292,6 +342,26 @@ void COutputter::OutputElementStress()
 					CBarMaterial& material = *dynamic_cast<CBarMaterial*>(Element.GetElementMaterial());
 					*this << setw(5) << Ele + 1 << setw(22) << stress * material.Area << setw(18)
 						<< stress << endl;
+				}
+
+				*this << endl;
+
+				break;
+
+			case ElementTypes::Q4: // Q4 element
+				*this << "  ELEMENT                                        STRESS COMPONENTS" << endl
+					  << "  NUMBER        S11             S22             S33             S12             S13             S23" << endl;
+				
+				double Stress[6];
+
+				for (unsigned int Ele = 0; Ele < NUME; Ele++)
+				{
+					CElement& Element = EleGrp[Ele];
+					Element.ElementStress(Stress, Displacement);
+
+					C2DMaterial& material = *dynamic_cast<C2DMaterial*>(Element.GetElementMaterial());
+					*this << setw(5) << Ele + 1 << setw(18) << Stress[0] << setw(16) << Stress[1] << setw(16) << Stress[2]
+						<< setw(16) << Stress[3] << setw(16) << Stress[4] << setw(16) << Stress[5] << endl;
 				}
 
 				*this << endl;

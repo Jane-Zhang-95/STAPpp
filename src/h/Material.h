@@ -52,3 +52,19 @@ public:
 //!	Write material data to Stream
 	virtual void Write(COutputter& output);
 };
+
+//! Material class for 2D plate element
+class C2DMaterial : public CMaterial
+{
+public:
+
+	double mu;	//! Poisson ratio
+
+public:
+
+//! Read material data from stream Input
+	virtual bool Read(ifstream& Input);
+
+//! Write material data to Stream
+	virtual void Write(COutputter& output);
+};
