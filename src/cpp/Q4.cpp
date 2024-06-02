@@ -204,7 +204,7 @@ void CQ4::ElementStress(double* stress, double* Displacement)
 		+ E / (1 - v * v) * 
 		(N1_y * displacement[1] + N2_y * displacement[4] + N3_y * displacement[7] + N4_y * displacement[10]);
 
-	stress[2] = -v * (stress[0] + stress[1]);
+	stress[2] = 0;
 
 	stress[3] = E / 2 / (1 + v) *
 		(N1_y * displacement[0] + N2_y * displacement[3] + N3_y * displacement[6] + N4_y * displacement[9]
