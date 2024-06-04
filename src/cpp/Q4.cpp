@@ -99,7 +99,7 @@ void CQ4::ElementStiffness(double* Matrix)
 			double N3_y = 1.0 / 4 * (J_inv_21 * (1 + P_j) + J_inv_22 * (1 + P_i));
 			double N4_y = 1.0 / 4 * (J_inv_21 * (-P_j - 1) + J_inv_22 * (1 - P_i));
 
-			Matrix[0] += W_i * W_j * (N1_x * N1_x * E / (1 - v * v) + N1_x * N1_y * E / 2 / (1 + v)) * det_J;
+			Matrix[0] += W_i * W_j * (N1_x * N1_x * E / (1 - v * v) + N1_y * N1_y * E / 2 / (1 + v)) * det_J;
 
 			Matrix[1] += W_i * W_j * (N1_y * N1_y * E / (1 - v * v) + N1_x * N1_x * E / 2 / (1 + v)) * det_J;
 			Matrix[2] += W_i * W_j * (N1_x * N1_y * E / 2 / (1 - v)) * det_J;
@@ -144,7 +144,7 @@ void CQ4::ElementStiffness(double* Matrix)
 			Matrix[65] += W_i * W_j * (N1_x * N4_y * E * v / (1 - v * v) + N1_y * N4_x * E / 2 / (1 + v)) * det_J;
 		}
 	}
-
+	
 }
 
 //  Calculate element stress
