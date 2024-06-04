@@ -60,9 +60,16 @@ void CQ4::ElementStiffness(double* Matrix)
 
 	double E = material_->E;
 	double v = material_->mu;
+	bool plane_stress = material_->plane_stress;
 
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 2; j++) {
+	if (!plane_stress)	// plane strain condition
+	{
+		E = E / (1 - v * v);
+		v = v / (1 - v);
+	}
+
+	for (unsigned int i = 0; i < 2; i++) {
+		for (unsigned int j = 0; j < 2; j++) {
 			// Gaussian quadrature weights and points
 			double W_i = GaussianQuadrature::weights_2p[i];
 			double W_j = GaussianQuadrature::weights_2p[j];
@@ -147,67 +154,86 @@ void CQ4::ElementStress(double* stress, double* Displacement)
 
 	double E = material_->E;
 	double v = material_->mu;
+	bool plane_stress = material_->plane_stress;
 
-	// Coordinates of the stress superconvergence point
-	double P_i = 0;
-	double P_j = 0;
-
-	// Jacobian matrix and det
-	double J_11 = 1.0 / 4 * ((P_j - 1) * (nodes_[0]->XYZ[0]) + (1 - P_j) * (nodes_[1]->XYZ[0]) + (1 + P_j) * (nodes_[2]->XYZ[0]) + (-P_j - 1) * (nodes_[3]->XYZ[0]));
-	double J_12 = 1.0 / 4 * ((P_j - 1) * (nodes_[0]->XYZ[1]) + (1 - P_j) * (nodes_[1]->XYZ[1]) + (1 + P_j) * (nodes_[2]->XYZ[1]) + (-P_j - 1) * (nodes_[3]->XYZ[1]));
-	double J_21 = 1.0 / 4 * ((P_i - 1) * (nodes_[0]->XYZ[0]) + (-P_i - 1) * (nodes_[1]->XYZ[0]) + (1 + P_i) * (nodes_[2]->XYZ[0]) + (1 - P_i) * (nodes_[3]->XYZ[0]));
-	double J_22 = 1.0 / 4 * ((P_i - 1) * (nodes_[0]->XYZ[1]) + (-P_i - 1) * (nodes_[1]->XYZ[1]) + (1 + P_i) * (nodes_[2]->XYZ[1]) + (1 - P_i) * (nodes_[3]->XYZ[1]));
-	double det_J = J_11 * J_22 - J_12 * J_21;
-
-	// Inv of J
-	double J_inv_11 = J_22 / det_J;
-	double J_inv_12 = -J_12 / det_J;
-	double J_inv_21 = -J_21 / det_J;
-	double J_inv_22 = J_11 / det_J;
-
-	// Grad of shape function
-	double N1_x = 1.0 / 4 * (J_inv_11 * (P_j - 1) + J_inv_12 * (P_i - 1));
-	double N2_x = 1.0 / 4 * (J_inv_11 * (1 - P_j) + J_inv_12 * (-P_i - 1));
-	double N3_x = 1.0 / 4 * (J_inv_11 * (1 + P_j) + J_inv_12 * (1 + P_i));
-	double N4_x = 1.0 / 4 * (J_inv_11 * (-P_j - 1) + J_inv_12 * (1 - P_i));
-	double N1_y = 1.0 / 4 * (J_inv_21 * (P_j - 1) + J_inv_22 * (P_i - 1));
-	double N2_y = 1.0 / 4 * (J_inv_21 * (1 - P_j) + J_inv_22 * (-P_i - 1));
-	double N3_y = 1.0 / 4 * (J_inv_21 * (1 + P_j) + J_inv_22 * (1 + P_i));
-	double N4_y = 1.0 / 4 * (J_inv_21 * (-P_j - 1) + J_inv_22 * (1 - P_i));
-
-	// Rebuild local displacement
-	double displacement[12];
-
-	for (unsigned int i = 0; i < 12; i++)
+	if (!plane_stress)	// plane strain condition
 	{
-		if (LocationMatrix_[i])
-		{
-			displacement[i] = Displacement[LocationMatrix_[i] - 1];
-		}
-		else
-		{
-			displacement[i] = 0;
-		}
+		E = E / (1 - v * v);
+		v = v / (1 - v);
 	}
 
-	for (unsigned int i = 0; i < 6; i++) {
+	for (unsigned int i = 0; i < 24; i++) {
 		stress[i] = 0.0;
 	}
 
-	stress[0] = E / (1 - v * v) *
-		(N1_x * displacement[0] + N2_x * displacement[3] + N3_x * displacement[6] + N4_x * displacement[9])
-		+ E * v / (1 - v * v) * 
-		(N1_y * displacement[1] + N2_y * displacement[4] + N3_y * displacement[7] + N4_y * displacement[10]);
+	for (unsigned i = 0; i < 2; i++)
+	{
+		for (unsigned j = 0; j < 2; j++)
+		{
+			// Coordinates of the stress superconvergence point
+			double P_i = GaussianQuadrature::points_2p[i];
+			double P_j = GaussianQuadrature::points_2p[j];
 
-	stress[1] = E * v / (1 - v * v) * 
-		(N1_x * displacement[0] + N2_x * displacement[3] + N3_x * displacement[6] + N4_x * displacement[9])
-		+ E / (1 - v * v) * 
-		(N1_y * displacement[1] + N2_y * displacement[4] + N3_y * displacement[7] + N4_y * displacement[10]);
+			// Jacobian matrix and det
+			double J_11 = 1.0 / 4 * ((P_j - 1) * (nodes_[0]->XYZ[0]) + (1 - P_j) * (nodes_[1]->XYZ[0]) + (1 + P_j) * (nodes_[2]->XYZ[0]) + (-P_j - 1) * (nodes_[3]->XYZ[0]));
+			double J_12 = 1.0 / 4 * ((P_j - 1) * (nodes_[0]->XYZ[1]) + (1 - P_j) * (nodes_[1]->XYZ[1]) + (1 + P_j) * (nodes_[2]->XYZ[1]) + (-P_j - 1) * (nodes_[3]->XYZ[1]));
+			double J_21 = 1.0 / 4 * ((P_i - 1) * (nodes_[0]->XYZ[0]) + (-P_i - 1) * (nodes_[1]->XYZ[0]) + (1 + P_i) * (nodes_[2]->XYZ[0]) + (1 - P_i) * (nodes_[3]->XYZ[0]));
+			double J_22 = 1.0 / 4 * ((P_i - 1) * (nodes_[0]->XYZ[1]) + (-P_i - 1) * (nodes_[1]->XYZ[1]) + (1 + P_i) * (nodes_[2]->XYZ[1]) + (1 - P_i) * (nodes_[3]->XYZ[1]));
+			double det_J = J_11 * J_22 - J_12 * J_21;
 
-	stress[2] = 0;
+			// Inv of J
+			double J_inv_11 = J_22 / det_J;
+			double J_inv_12 = -J_12 / det_J;
+			double J_inv_21 = -J_21 / det_J;
+			double J_inv_22 = J_11 / det_J;
 
-	stress[3] = E / 2 / (1 + v) *
-		(N1_y * displacement[0] + N2_y * displacement[3] + N3_y * displacement[6] + N4_y * displacement[9]
-			+ N1_x * displacement[1] + N2_x * displacement[4] + N3_x * displacement[7] + N4_x * displacement[10]);
-	return;
+			// Grad of shape function
+			double N1_x = 1.0 / 4 * (J_inv_11 * (P_j - 1) + J_inv_12 * (P_i - 1));
+			double N2_x = 1.0 / 4 * (J_inv_11 * (1 - P_j) + J_inv_12 * (-P_i - 1));
+			double N3_x = 1.0 / 4 * (J_inv_11 * (1 + P_j) + J_inv_12 * (1 + P_i));
+			double N4_x = 1.0 / 4 * (J_inv_11 * (-P_j - 1) + J_inv_12 * (1 - P_i));
+			double N1_y = 1.0 / 4 * (J_inv_21 * (P_j - 1) + J_inv_22 * (P_i - 1));
+			double N2_y = 1.0 / 4 * (J_inv_21 * (1 - P_j) + J_inv_22 * (-P_i - 1));
+			double N3_y = 1.0 / 4 * (J_inv_21 * (1 + P_j) + J_inv_22 * (1 + P_i));
+			double N4_y = 1.0 / 4 * (J_inv_21 * (-P_j - 1) + J_inv_22 * (1 - P_i));
+
+			// Rebuild local displacement
+			double displacement[12];
+
+			for (unsigned int i = 0; i < 12; i++)
+			{
+				if (LocationMatrix_[i])
+				{
+					displacement[i] = Displacement[LocationMatrix_[i] - 1];
+				}
+				else
+				{
+					displacement[i] = 0;
+				}
+			}
+
+			stress[(i * 2 + j) * 6 + 0] = E / (1 - v * v) *
+				(N1_x * displacement[0] + N2_x * displacement[3] + N3_x * displacement[6] + N4_x * displacement[9])
+				+ E * v / (1 - v * v) *
+				(N1_y * displacement[1] + N2_y * displacement[4] + N3_y * displacement[7] + N4_y * displacement[10]);
+
+			stress[(i * 2 + j) * 6 + 1] = E * v / (1 - v * v) *
+				(N1_x * displacement[0] + N2_x * displacement[3] + N3_x * displacement[6] + N4_x * displacement[9])
+				+ E / (1 - v * v) *
+				(N1_y * displacement[1] + N2_y * displacement[4] + N3_y * displacement[7] + N4_y * displacement[10]);
+
+			if (!plane_stress)
+			{
+				stress[(i * 2 + j) * 6 + 2] = v / (1 + v) * (stress[0] + stress[1]);
+			}
+			else
+			{
+				stress[(i * 2 + j) * 6 + 2] = 0;
+			}
+
+			stress[(i * 2 + j) * 6 + 3] = E / 2 / (1 + v) *
+				(N1_y * displacement[0] + N2_y * displacement[3] + N3_y * displacement[6] + N4_y * displacement[9]
+					+ N1_x * displacement[1] + N2_x * displacement[4] + N3_x * displacement[7] + N4_x * displacement[10]);
+		}
+	}
 }

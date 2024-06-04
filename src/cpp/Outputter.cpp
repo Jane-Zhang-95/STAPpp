@@ -232,9 +232,9 @@ void COutputter::OutputQ4Elements(unsigned int EleGrp)
 		<< endl
 		<< endl;
 
-	*this << "  SET       YOUNG'S         POISSON" << endl
-		<< " NUMBER     MODULUS          RATIO" << endl
-		<< "               E               MU" << endl;
+	*this << "  SET       YOUNG'S         POISSON           PLANE" << endl
+		<< " NUMBER     MODULUS          RATIO           STRESS" << endl
+		<< "               E               MU             FLAG" << endl;
 
 	*this << setiosflags(ios::scientific) << setprecision(5);
 
@@ -349,10 +349,10 @@ void COutputter::OutputElementStress()
 				break;
 
 			case ElementTypes::Q4: // Q4 element
-				*this << "  ELEMENT                                        STRESS COMPONENTS" << endl
-					  << "  NUMBER        S11             S22             S33             S12             S13             S23" << endl;
+				*this << "  ELEMENT(GAUSS)                                      STRESS COMPONENTS" << endl
+					  << "     NUMBER          S11             S22             S33             S12             S13             S23" << endl;
 				
-				double Stress[6];
+				double Stress[24];
 
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
@@ -360,8 +360,14 @@ void COutputter::OutputElementStress()
 					Element.ElementStress(Stress, Displacement);
 
 					C2DMaterial& material = *dynamic_cast<C2DMaterial*>(Element.GetElementMaterial());
-					*this << setw(5) << Ele + 1 << setw(18) << Stress[0] << setw(16) << Stress[1] << setw(16) << Stress[2]
+					*this << setw(5) << Ele + 1 << " (-,-)" << setw(18) << Stress[0] << setw(16) << Stress[1] << setw(16) << Stress[2]
 						<< setw(16) << Stress[3] << setw(16) << Stress[4] << setw(16) << Stress[5] << endl;
+					*this << setw(5) << Ele + 1 << " (-,+)" << setw(18) << Stress[6] << setw(16) << Stress[7] << setw(16) << Stress[8]
+						<< setw(16) << Stress[9] << setw(16) << Stress[10] << setw(16) << Stress[11] << endl;
+					*this << setw(5) << Ele + 1 << " (+,-)" << setw(18) << Stress[12] << setw(16) << Stress[13] << setw(16) << Stress[14]
+						<< setw(16) << Stress[15] << setw(16) << Stress[16] << setw(16) << Stress[17] << endl;
+					*this << setw(5) << Ele + 1 << " (+,+)" << setw(18) << Stress[18] << setw(16) << Stress[19] << setw(16) << Stress[20]
+						<< setw(16) << Stress[21] << setw(16) << Stress[22] << setw(16) << Stress[23] << endl;
 				}
 
 				*this << endl;

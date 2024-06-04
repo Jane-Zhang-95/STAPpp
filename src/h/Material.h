@@ -58,7 +58,9 @@ class C2DMaterial : public CMaterial
 {
 public:
 
-	double mu;	//! Poisson ratio
+	double mu;	//!< Poisson ratio
+
+	bool plane_stress;	//!< Plane stress = True, Plane strain = False 
 
 public:
 

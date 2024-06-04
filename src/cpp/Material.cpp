@@ -32,6 +32,8 @@ bool C2DMaterial::Read(ifstream& Input)
 
 	Input >> E >> mu;	// Young's modulus and Poisson ratio
 
+	Input >> plane_stress;	// Plane stress indicator, True if plane stress, False if plane strain
+
 	return true;
 }
 
@@ -43,5 +45,5 @@ void CBarMaterial::Write(COutputter& output)
 
 void C2DMaterial::Write(COutputter& output)
 {
-	output << setw(16) << E << setw(16) << mu << endl;
+	output << setw(16) << E << setw(16) << mu << setw(12) << plane_stress << endl;
 }
