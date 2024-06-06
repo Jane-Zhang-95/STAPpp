@@ -166,6 +166,21 @@ void CQ4::ElementStress(double* stress, double* Displacement)
 		stress[i] = 0.0;
 	}
 
+	// Rebuild local displacement
+	double displacement[12];
+
+	for (unsigned int i = 0; i < 12; i++)
+	{
+		if (LocationMatrix_[i])
+		{
+			displacement[i] = Displacement[LocationMatrix_[i] - 1];
+		}
+		else
+		{
+			displacement[i] = 0;
+		}
+	}
+
 	for (unsigned i = 0; i < 2; i++)
 	{
 		for (unsigned j = 0; j < 2; j++)
@@ -196,21 +211,6 @@ void CQ4::ElementStress(double* stress, double* Displacement)
 			double N2_y = 1.0 / 4 * (J_inv_21 * (1 - P_j) + J_inv_22 * (-P_i - 1));
 			double N3_y = 1.0 / 4 * (J_inv_21 * (1 + P_j) + J_inv_22 * (1 + P_i));
 			double N4_y = 1.0 / 4 * (J_inv_21 * (-P_j - 1) + J_inv_22 * (1 - P_i));
-
-			// Rebuild local displacement
-			double displacement[12];
-
-			for (unsigned int i = 0; i < 12; i++)
-			{
-				if (LocationMatrix_[i])
-				{
-					displacement[i] = Displacement[LocationMatrix_[i] - 1];
-				}
-				else
-				{
-					displacement[i] = 0;
-				}
-			}
 
 			stress[(i * 2 + j) * 6 + 0] = E / (1 - v * v) *
 				(N1_x * displacement[0] + N2_x * displacement[3] + N3_x * displacement[6] + N4_x * displacement[9])
