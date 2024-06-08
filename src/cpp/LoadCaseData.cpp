@@ -8,6 +8,7 @@
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
 
+
 #include "LoadCaseData.h"
 
 #include <iomanip>
@@ -15,19 +16,26 @@
 
 using namespace std;
 
+
 CLoadCaseData :: ~CLoadCaseData()
 {
-	delete [] node;
+	delete [] node_load;
 	delete [] dof;
 	delete [] load;
+	delete [] node_nbc;
+	delete [] nbc;
 }
 
-void CLoadCaseData :: Allocate(unsigned int num)
+// allocate storage
+void CLoadCaseData :: Allocate(unsigned int num_load, unsigned int num_nbc)
 {
-	nloads = num;
-	node = new unsigned int[nloads];
+	nloads = num_load; 
+	node_load = new unsigned int[nloads]; 
 	dof = new unsigned int[nloads];
 	load = new double[nloads];
+	nnbc = num_nbc;
+	node_nbc = new unsigned int[nnbc];
+	nbc = new double[nnbc];
 }; 
 
 //	Read load case data from stream Input
@@ -35,21 +43,40 @@ bool CLoadCaseData :: Read(ifstream& Input)
 {
 //	Load case number (LL) and number of concentrated loads in this load case(NL)
 	
-	unsigned int NL;
+	// number of load, number of natural bounce condition
+	unsigned int NL, NNBC;
 
-	Input >> NL;
-
-	Allocate(NL);
-
+	Input >> NL >> NNBC;
+	
+	Allocate(NL, NNBC); //load number in this one
 	for (unsigned int i = 0; i < NL; i++)
-		Input >> node[i] >> dof[i] >> load[i];
+		Input >> node_load[i] >> dof[i] >> load[i];
+	
+	int j = 0;
+	for (unsigned int i = 0; i < NNBC; i++){
+		Input >> node_nbc[j] >> node_nbc[j+1] >> dof_nbc[j] >> dof_nbc[j+1]>> nbc[j] >> nbc[j+1];
+		j = j+2;
+		
+		//require 2 dof are the same
+		if(dof_nbc[j]!=dof_nbc[j+1]){
+			cerr << "*** Error *** 2 dof should be the same for Natural Bounce Condition!" << endl
+			<< "    Wrong dof input : " << i+1 << endl;
+			return false;
+		}
+	}
 
 	return true;
 }
 
 //	Write load case data to stream
-void CLoadCaseData::Write(COutputter& output)
+void CLoadCaseData::Write(COutputter& output) //output as a COutputter
 {
-	for (unsigned int i = 0; i < nloads; i++)
-		output << setw(7) << node[i] << setw(13) << dof[i]  << setw(19) << load[i] << endl;
+	for (unsigned int i = 0; i < nloads; i++){
+		output << setw(7) << node_load[i] << setw(13) << dof[i]  << setw(19) << load[i] << endl; 
+	}
+	int j;
+	j = 0;
+	for (unsigned int i = 0; i < nnbc; i++){
+		output << setw(7) << node_nbc[j] << setw(7) << node_nbc[j+1] << setw(13) << dof_nbc[j] << setw(7) << dof_nbc[j+1] << setw(19) << nbc[j] << setw(7) << nbc[j+1] << endl;
+	}
 }

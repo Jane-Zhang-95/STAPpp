@@ -52,3 +52,30 @@ public:
 //!	Write material data to Stream
 	virtual void Write(COutputter& output);
 };
+
+class CT3Material : public CMaterial
+{
+public:
+
+	unsigned int Stress_Mode; //plane stress or strain
+	double nu; //possion ratio nu
+	double h_T3; //element thickness
+	double Area; 
+	double* D; //DMatrix
+	// double Area_T3;	//!< Sectional area of a triangle element
+
+public:
+
+	//! Virtual deconstructor
+    virtual ~CT3Material() {
+		if(D)
+			delete[] D;
+	};
+//!	Read material data from stream Input
+	virtual bool Read(ifstream& Input);
+
+//!	Write material data to Stream
+	virtual void Write(COutputter& output);
+
+	virtual double Get_h() {return h_T3;};
+};

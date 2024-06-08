@@ -1,12 +1,3 @@
-/*****************************************************************************/
-/*  STAP++ : A C++ FEM code sharing the same input data file with STAP90     */
-/*     Computational Dynamics Laboratory                                     */
-/*     School of Aerospace Engineering, Tsinghua University                  */
-/*                                                                           */
-/*     Release 1.11, November 22, 2017                                       */
-/*                                                                           */
-/*     http://www.comdyn.cn/                                                 */
-/*****************************************************************************/
 
 #include "ElementGroup.h"
 #include "Domain.h"
@@ -14,21 +5,21 @@
 CNode* CElementGroup::NodeList_ = nullptr;
 
 //! Constructor
-CElementGroup::CElementGroup()
-{
-    if (!NodeList_)
-    {
-        CDomain* FEMData = CDomain::GetInstance();
-        NodeList_ = FEMData->GetNodeList();
-    }
-    
-    ElementType_ = ElementTypes::UNDEFINED;
-    
-    NUME_ = 0;
-    ElementList_ = nullptr;
-    
-    NUMMAT_ = 0;
-    MaterialList_ = nullptr;
+CElementGroup::CElementGroup()  
+{  
+    if (!NodeList_)  //nodelist empty
+    {   
+        CDomain* FEMData = CDomain::GetInstance();  
+        NodeList_ = FEMData->GetNodeList();  
+    }  
+      
+    ElementType_ = ElementTypes::UNDEFINED;  
+      
+    NUME_ = 0;  
+    ElementList_ = nullptr;  
+       
+    NUMMAT_ = 0;  
+    MaterialList_ = nullptr;  
 }
 
 //! Deconstructor
@@ -66,6 +57,10 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CBar);
             MaterialSize_ = sizeof(CBarMaterial);
             break;
+        case ElementTypes::T3:
+            ElementSize_ = sizeof(CT3);
+            MaterialSize_ = sizeof(CT3Material);
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not available. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
@@ -81,6 +76,9 @@ void CElementGroup::AllocateElements(std::size_t size)
         case ElementTypes::Bar:
             ElementList_ = new CBar[size];
             break;
+        case ElementTypes::T3:
+            ElementList_ = new CT3[size];
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not available. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
@@ -94,6 +92,9 @@ void CElementGroup::AllocateMaterials(std::size_t size)
     {
         case ElementTypes::Bar:
             MaterialList_ = new CBarMaterial[size];
+            break;
+        case ElementTypes::T3:
+            MaterialList_ = new CT3Material[size];
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not available. See CElementGroup::AllocateMaterial." << std::endl;
