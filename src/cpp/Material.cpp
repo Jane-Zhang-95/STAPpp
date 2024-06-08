@@ -30,7 +30,7 @@ bool C2DMaterial::Read(ifstream& Input)
 {
 	Input >> nset;	// Number of property set
 
-	Input >> E >> mu;	// Young's modulus and Poisson ratio
+	Input >> E >> mu >> thickness;	// Young's modulus, Poisson ratio and thickness of the plate
 
 	Input >> plane_stress;	// Plane stress indicator, True if plane stress, False if plane strain
 
@@ -45,5 +45,5 @@ void CBarMaterial::Write(COutputter& output)
 
 void C2DMaterial::Write(COutputter& output)
 {
-	output << setw(16) << E << setw(16) << mu << setw(12) << plane_stress << endl;
+	output << setw(16) << E << setw(16) << mu << setw(16) << thickness << setw(12) << plane_stress << endl;
 }

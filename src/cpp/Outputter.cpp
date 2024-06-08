@@ -232,9 +232,9 @@ void COutputter::OutputQ4Elements(unsigned int EleGrp)
 		<< endl
 		<< endl;
 
-	*this << "  SET       YOUNG'S         POISSON           PLANE" << endl
-		<< " NUMBER     MODULUS          RATIO           STRESS" << endl
-		<< "               E               MU             FLAG" << endl;
+	*this << "  SET       YOUNG'S         POISSON          THICK            PLANE" << endl
+		<< " NUMBER     MODULUS          RATIO           -NESS           STRESS" << endl
+		<< "               E               MU              T              FLAG" << endl;
 
 	*this << setiosflags(ios::scientific) << setprecision(5);
 
