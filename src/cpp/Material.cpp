@@ -26,8 +26,24 @@ bool CBarMaterial::Read(ifstream& Input)
 	return true;
 }
 
+bool C2DMaterial::Read(ifstream& Input)
+{
+	Input >> nset;	// Number of property set
+
+	Input >> E >> mu;	// Young's modulus and Poisson ratio
+
+	Input >> plane_stress;	// Plane stress indicator, True if plane stress, False if plane strain
+
+	return true;
+}
+
 //	Write material data to Stream
 void CBarMaterial::Write(COutputter& output)
 {
 	output << setw(16) << E << setw(16) << Area << endl;
+}
+
+void C2DMaterial::Write(COutputter& output)
+{
+	output << setw(16) << E << setw(16) << mu << setw(12) << plane_stress << endl;
 }
