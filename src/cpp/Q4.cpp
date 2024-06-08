@@ -60,6 +60,7 @@ void CQ4::ElementStiffness(double* Matrix)
 
 	double E = material_->E;
 	double v = material_->mu;
+	double t = material_->thickness;
 	bool plane_stress = material_->plane_stress;
 
 	if (!plane_stress)	// plane strain condition
@@ -99,49 +100,49 @@ void CQ4::ElementStiffness(double* Matrix)
 			double N3_y = 1.0 / 4 * (J_inv_21 * (1 + P_j) + J_inv_22 * (1 + P_i));
 			double N4_y = 1.0 / 4 * (J_inv_21 * (-P_j - 1) + J_inv_22 * (1 - P_i));
 
-			Matrix[0] += W_i * W_j * (N1_x * N1_x * E / (1 - v * v) + N1_y * N1_y * E / 2 / (1 + v)) * det_J;
+			Matrix[0] += W_i * W_j * (N1_x * N1_x * E / (1 - v * v) + N1_y * N1_y * E / 2 / (1 + v)) * det_J * t;
 
-			Matrix[1] += W_i * W_j * (N1_y * N1_y * E / (1 - v * v) + N1_x * N1_x * E / 2 / (1 + v)) * det_J;
-			Matrix[2] += W_i * W_j * (N1_x * N1_y * E / 2 / (1 - v)) * det_J;
+			Matrix[1] += W_i * W_j * (N1_y * N1_y * E / (1 - v * v) + N1_x * N1_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[2] += W_i * W_j * (N1_x * N1_y * E / 2 / (1 - v)) * det_J * t;
 
-			Matrix[6] += W_i * W_j * (N2_x * N2_x * E / (1 - v * v) + N2_y * N2_y * E / 2 / (1 + v)) * det_J;
-			Matrix[8] += W_i * W_j * (N1_y * N2_x * E * v / (1 - v * v) + N1_x * N2_y * E / 2 / (1 + v)) * det_J;
-			Matrix[9] += W_i * W_j * (N1_x * N2_x * E / (1 - v * v) + N1_y * N2_y * E / 2 / (1 + v)) * det_J;
+			Matrix[6] += W_i * W_j * (N2_x * N2_x * E / (1 - v * v) + N2_y * N2_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[8] += W_i * W_j * (N1_y * N2_x * E * v / (1 - v * v) + N1_x * N2_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[9] += W_i * W_j * (N1_x * N2_x * E / (1 - v * v) + N1_y * N2_y * E / 2 / (1 + v)) * det_J * t;
 
-			Matrix[10] += W_i * W_j * (N2_y * N2_y * E / (1 - v * v) + N2_x * N2_x * E / 2 / (1 + v)) * det_J;
-			Matrix[11] += W_i * W_j * (N2_x * N2_y * E / 2 / (1 - v)) * det_J;
-			Matrix[13] += W_i * W_j * (N1_y * N2_y * E / (1 - v * v) + N1_x * N2_x * E / 2 / (1 + v)) * det_J;
-			Matrix[14] += W_i * W_j * (N1_x * N2_y * E * v / (1 - v * v) + N1_y * N2_x * E / 2 / (1 + v)) *det_J;
+			Matrix[10] += W_i * W_j * (N2_y * N2_y * E / (1 - v * v) + N2_x * N2_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[11] += W_i * W_j * (N2_x * N2_y * E / 2 / (1 - v)) * det_J * t;
+			Matrix[13] += W_i * W_j * (N1_y * N2_y * E / (1 - v * v) + N1_x * N2_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[14] += W_i * W_j * (N1_x * N2_y * E * v / (1 - v * v) + N1_y * N2_x * E / 2 / (1 + v)) *det_J * t;
 
-			Matrix[21] += W_i * W_j * (N3_x * N3_x * E / (1 - v * v) + N3_y * N3_y * E / 2 / (1 + v)) * det_J;
-			Matrix[23] += W_i * W_j * (N2_y * N3_x * E * v / (1 - v * v) + N2_x * N3_y * E / 2 / (1 + v)) * det_J;
-			Matrix[24] += W_i * W_j * (N2_x * N3_x * E / (1 - v * v) + N2_y * N3_y * E / 2 / (1 + v)) * det_J;
-			Matrix[26] += W_i * W_j * (N1_y * N3_x * E * v / (1 - v * v) + N1_x * N3_y * E / 2 / (1 + v)) * det_J;
-			Matrix[27] += W_i * W_j * (N1_x * N3_x * E / (1 - v * v) + N1_y * N3_y * E / 2 / (1 + v)) * det_J;
+			Matrix[21] += W_i * W_j * (N3_x * N3_x * E / (1 - v * v) + N3_y * N3_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[23] += W_i * W_j * (N2_y * N3_x * E * v / (1 - v * v) + N2_x * N3_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[24] += W_i * W_j * (N2_x * N3_x * E / (1 - v * v) + N2_y * N3_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[26] += W_i * W_j * (N1_y * N3_x * E * v / (1 - v * v) + N1_x * N3_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[27] += W_i * W_j * (N1_x * N3_x * E / (1 - v * v) + N1_y * N3_y * E / 2 / (1 + v)) * det_J * t;
 			
-			Matrix[28] += W_i * W_j * (N3_y * N3_y * E / (1 - v * v) + N3_x * N3_x * E / 2 / (1 + v)) * det_J;
-			Matrix[29] += W_i * W_j * (N3_x * N3_y * E / 2 / (1 - v)) * det_J;
-			Matrix[31] += W_i * W_j * (N2_y * N3_y * E / (1 - v * v) + N2_x * N3_x * E / 2 / (1 + v)) * det_J;
-			Matrix[32] += W_i * W_j * (N2_x * N3_y * E * v / (1 - v * v) + N2_y * N3_x * E / 2 / (1 + v)) * det_J;
-			Matrix[34] += W_i * W_j * (N1_y * N3_y * E / (1 - v * v) + N1_x * N3_x * E / 2 / (1 + v)) * det_J;
-			Matrix[35] += W_i * W_j * (N1_x * N3_y * E * v / (1 - v * v) + N1_y * N3_x * E / 2 / (1 + v)) * det_J;
+			Matrix[28] += W_i * W_j * (N3_y * N3_y * E / (1 - v * v) + N3_x * N3_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[29] += W_i * W_j * (N3_x * N3_y * E / 2 / (1 - v)) * det_J * t;
+			Matrix[31] += W_i * W_j * (N2_y * N3_y * E / (1 - v * v) + N2_x * N3_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[32] += W_i * W_j * (N2_x * N3_y * E * v / (1 - v * v) + N2_y * N3_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[34] += W_i * W_j * (N1_y * N3_y * E / (1 - v * v) + N1_x * N3_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[35] += W_i * W_j * (N1_x * N3_y * E * v / (1 - v * v) + N1_y * N3_x * E / 2 / (1 + v)) * det_J * t;
 			
-			Matrix[45] += W_i * W_j * (N4_x * N4_x * E / (1 - v * v) + N4_y * N4_y * E / 2 / (1 + v)) * det_J;
-			Matrix[47] += W_i * W_j * (N3_y * N4_x * E * v / (1 - v * v) + N3_x * N4_y * E / 2 / (1 + v)) * det_J;
-			Matrix[48] += W_i * W_j * (N3_x * N4_x * E / (1 - v * v) + N3_y * N4_y * E / 2 / (1 + v)) * det_J;
-			Matrix[50] += W_i * W_j * (N2_y * N4_x * E * v / (1 - v * v) + N2_x * N4_y * E / 2 / (1 + v)) * det_J;
-			Matrix[51] += W_i * W_j * (N2_x * N4_x * E / (1 - v * v) + N2_y * N4_y * E / 2 / (1 + v)) * det_J;
-			Matrix[53] += W_i * W_j * (N1_y * N4_x * E * v / (1 - v * v) + N1_x * N4_y * E / 2 / (1 + v)) * det_J;
-			Matrix[54] += W_i * W_j * (N1_x * N4_x * E / (1 - v * v) + N1_y * N4_y * E / 2 / (1 + v)) * det_J;
+			Matrix[45] += W_i * W_j * (N4_x * N4_x * E / (1 - v * v) + N4_y * N4_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[47] += W_i * W_j * (N3_y * N4_x * E * v / (1 - v * v) + N3_x * N4_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[48] += W_i * W_j * (N3_x * N4_x * E / (1 - v * v) + N3_y * N4_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[50] += W_i * W_j * (N2_y * N4_x * E * v / (1 - v * v) + N2_x * N4_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[51] += W_i * W_j * (N2_x * N4_x * E / (1 - v * v) + N2_y * N4_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[53] += W_i * W_j * (N1_y * N4_x * E * v / (1 - v * v) + N1_x * N4_y * E / 2 / (1 + v)) * det_J * t;
+			Matrix[54] += W_i * W_j * (N1_x * N4_x * E / (1 - v * v) + N1_y * N4_y * E / 2 / (1 + v)) * det_J * t;
 
-			Matrix[55] += W_i * W_j * (N4_y * N4_y * E / (1 - v * v) + N4_x * N4_x * E / 2 / (1 + v)) * det_J;
-			Matrix[56] += W_i * W_j * (N4_x * N4_y * E / 2 / (1 - v)) * det_J;
-			Matrix[58] += W_i * W_j * (N3_y * N4_y * E / (1 - v * v) + N3_x * N4_x * E / 2 / (1 + v)) * det_J;
-			Matrix[59] += W_i * W_j * (N3_x * N4_y * E * v / (1 - v * v) + N3_y * N4_x * E / 2 / (1 + v)) * det_J;
-			Matrix[61] += W_i * W_j * (N2_y * N4_y * E / (1 - v * v) + N2_x * N4_x * E / 2 / (1 + v)) * det_J;
-			Matrix[62] += W_i * W_j * (N2_x * N4_y * E * v / (1 - v * v) + N2_y * N4_x * E / 2 / (1 + v)) * det_J;
-			Matrix[64] += W_i * W_j * (N1_y * N4_y * E / (1 - v * v) + N1_x * N4_x * E / 2 / (1 + v)) * det_J;
-			Matrix[65] += W_i * W_j * (N1_x * N4_y * E * v / (1 - v * v) + N1_y * N4_x * E / 2 / (1 + v)) * det_J;
+			Matrix[55] += W_i * W_j * (N4_y * N4_y * E / (1 - v * v) + N4_x * N4_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[56] += W_i * W_j * (N4_x * N4_y * E / 2 / (1 - v)) * det_J * t;
+			Matrix[58] += W_i * W_j * (N3_y * N4_y * E / (1 - v * v) + N3_x * N4_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[59] += W_i * W_j * (N3_x * N4_y * E * v / (1 - v * v) + N3_y * N4_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[61] += W_i * W_j * (N2_y * N4_y * E / (1 - v * v) + N2_x * N4_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[62] += W_i * W_j * (N2_x * N4_y * E * v / (1 - v * v) + N2_y * N4_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[64] += W_i * W_j * (N1_y * N4_y * E / (1 - v * v) + N1_x * N4_x * E / 2 / (1 + v)) * det_J * t;
+			Matrix[65] += W_i * W_j * (N1_x * N4_y * E * v / (1 - v * v) + N1_y * N4_x * E / 2 / (1 + v)) * det_J * t;
 		}
 	}
 	
