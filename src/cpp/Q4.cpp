@@ -17,11 +17,10 @@ CQ4::CQ4()
 	LocationMatrix_ = new unsigned int[ND_];
 
 	ElementMaterial_ = nullptr;
-}
+	
+	Nmat = new double[8];
 
-//  Desconstructor
-CQ4::~CQ4()
-{
+	detJ = new double[9];
 }
 
 //  Read element data from stream Input
@@ -63,19 +62,31 @@ void CQ4::ElementStiffness(double* Matrix)
 	double t = material_->thickness;
 	bool plane_stress = material_->plane_stress;
 
-	if (!plane_stress)	// plane strain condition
+	if (plane_stress)	// plane strain condition
 	{
 		E = E / (1 - v * v);
 		v = v / (1 - v);
 	}
+	(*this).Nmat = new double[8];
 
-	for (unsigned int i = 0; i < 2; i++) {
-		for (unsigned int j = 0; j < 2; j++) {
+	double w[3] = {0};
+	double gp[3] = {0};
+	GaussianQuadrature Q4gauss;
+	unsigned int ngp = Q4gauss.ngp;
+	Q4gauss.Gauss_Calculate();
+	for(unsigned int i = 0; i<ngp; i++){
+		w[i] = Q4gauss.g_w[i];
+		gp[i] = Q4gauss.g_p[i];
+	}
+
+	for (unsigned int i = 0; i < ngp; i++) {
+		for (unsigned int j = 0; j < ngp; j++) {
+
 			// Gaussian quadrature weights and points
-			double W_i = GaussianQuadrature::weights_2p[i];
-			double W_j = GaussianQuadrature::weights_2p[j];
-			double P_i = GaussianQuadrature::points_2p[i];
-			double P_j = GaussianQuadrature::points_2p[j];
+			double W_i = w[i];
+			double W_j = w[j];
+			double P_i = gp[i];
+			double P_j = gp[j];
 
 			// Jacobian matrix and det
 			double J_11 = 1.0 / 4 * ((P_j - 1) * (nodes_[0]->XYZ[0]) + (1 - P_j) * (nodes_[1]->XYZ[0]) + (1 + P_j) * (nodes_[2]->XYZ[0]) + (-P_j - 1) * (nodes_[3]->XYZ[0]));
@@ -157,7 +168,7 @@ void CQ4::ElementStress(double* stress, double* Displacement)
 	double v = material_->mu;
 	bool plane_stress = material_->plane_stress;
 
-	if (!plane_stress)	// plane strain condition
+	if (plane_stress)	// plane strain condition
 	{
 		E = E / (1 - v * v);
 		v = v / (1 - v);
@@ -181,14 +192,24 @@ void CQ4::ElementStress(double* stress, double* Displacement)
 			displacement[i] = 0;
 		}
 	}
+	
+	double w[3] = {0};
+	double gp[3] = {0};
+	GaussianQuadrature Q4gauss;
+	unsigned int ngp = Q4gauss.ngp;
+	Q4gauss.Gauss_Calculate();
+	for(unsigned int i = 0; i<ngp; i++){
+		w[i] = Q4gauss.g_w[i];
+		gp[i] = Q4gauss.g_p[i];
+	}
 
-	for (unsigned i = 0; i < 2; i++)
+	for (unsigned i = 0; i < ngp; i++)
 	{
-		for (unsigned j = 0; j < 2; j++)
+		for (unsigned j = 0; j < ngp; j++)
 		{
 			// Coordinates of the stress superconvergence point
-			double P_i = GaussianQuadrature::points_2p[i];
-			double P_j = GaussianQuadrature::points_2p[j];
+			double P_i = gp[i];
+			double P_j = gp[j];
 
 			// Jacobian matrix and det
 			double J_11 = 1.0 / 4 * ((P_j - 1) * (nodes_[0]->XYZ[0]) + (1 - P_j) * (nodes_[1]->XYZ[0]) + (1 + P_j) * (nodes_[2]->XYZ[0]) + (-P_j - 1) * (nodes_[3]->XYZ[0]));
@@ -223,7 +244,7 @@ void CQ4::ElementStress(double* stress, double* Displacement)
 				+ E / (1 - v * v) *
 				(N1_y * displacement[1] + N2_y * displacement[4] + N3_y * displacement[7] + N4_y * displacement[10]);
 
-			if (!plane_stress)
+			if (plane_stress)
 			{
 				stress[(i * 2 + j) * 6 + 2] = v / (1 + v) * (stress[0] + stress[1]);
 			}
@@ -236,5 +257,106 @@ void CQ4::ElementStress(double* stress, double* Displacement)
 				(N1_y * displacement[0] + N2_y * displacement[3] + N3_y * displacement[6] + N4_y * displacement[9]
 					+ N1_x * displacement[1] + N2_x * displacement[4] + N3_x * displacement[7] + N4_x * displacement[10]);
 		}
+	}
+}
+
+// N define
+void CQ4::Calculate_Nmat(double psi, double eta){
+	
+	Nmat[0] = 0.25*(1-psi)*(1-eta);
+	Nmat[1] = 0.25*(1-psi)*(1-eta);
+	Nmat[2] = 0.25*(1+psi)*(1-eta);
+	Nmat[3] = 0.25*(1+psi)*(1-eta);
+	Nmat[4] = 0.25*(1+psi)*(1+eta);
+	Nmat[5] = 0.25*(1+psi)*(1+eta);
+	Nmat[6] = 0.25*(1-psi)*(1+eta);
+	Nmat[7] = 0.25*(1-psi)*(1+eta);
+}
+
+void CQ4::Calculate_detJ(){
+	
+	double w[3] = {0};
+	double gp[3] = {0};
+	GaussianQuadrature Q4gauss;
+	unsigned int ngp = Q4gauss.ngp;
+	Q4gauss.Gauss_Calculate();
+	for(unsigned int i = 0; i<ngp; i++){
+		w[i] = Q4gauss.g_w[i];
+		gp[i] = Q4gauss.g_p[i];
+	}
+
+	for(unsigned int i = 0;i<ngp;i++){
+		for(unsigned int j=0; j<ngp; j++){
+			double P_i = gp[i];
+			double P_j = gp[j];
+			double J_11 = 1.0 / 4 * ((P_j - 1) * (nodes_[0]->XYZ[0]) + (1 - P_j) * (nodes_[1]->XYZ[0]) + (1 + P_j) * (nodes_[2]->XYZ[0]) + (-P_j - 1) * (nodes_[3]->XYZ[0]));
+			double J_12 = 1.0 / 4 * ((P_j - 1) * (nodes_[0]->XYZ[1]) + (1 - P_j) * (nodes_[1]->XYZ[1]) + (1 + P_j) * (nodes_[2]->XYZ[1]) + (-P_j - 1) * (nodes_[3]->XYZ[1]));
+			double J_21 = 1.0 / 4 * ((P_i - 1) * (nodes_[0]->XYZ[0]) + (-P_i - 1) * (nodes_[1]->XYZ[0]) + (1 + P_i) * (nodes_[2]->XYZ[0]) + (1 - P_i) * (nodes_[3]->XYZ[0]));
+			double J_22 = 1.0 / 4 * ((P_i - 1) * (nodes_[0]->XYZ[1]) + (-P_i - 1) * (nodes_[1]->XYZ[1]) + (1 + P_i) * (nodes_[2]->XYZ[1]) + (1 - P_i) * (nodes_[3]->XYZ[1]));
+			detJ[ngp*i+j] = J_11 * J_22 - J_12 * J_21;
+		}
+	}
+}
+
+void CQ4::Calculate_NBC(double* Force, double t1, double t2){
+	clear(Force,2);
+	double w[3] = {0};
+	double gp[3] = {0};
+	GaussianQuadrature Q4gauss;
+	Q4gauss.Gauss_Calculate();
+	unsigned int ngp = Q4gauss.ngp;
+	//std::cout<<ngp<<endl;
+	for(unsigned int i = 0; i<ngp; i++){
+		w[i] = Q4gauss.g_w[i];
+		gp[i] = Q4gauss.g_p[i];
+	}
+	for(unsigned int i = 0;i<ngp;i++){
+		Calculate_Nmat(gp[i], -1);
+		double t = 0.5*(1-gp[i])*t1 + 0.5*(1+gp[i])*t2;
+		Force[0] += w[i]*Nmat[0]*t;
+		Force[1] += w[i]*Nmat[2]*t;
+	}
+}
+
+void CQ4::Calculate_BODY(double* Force){
+	clear(Force,12);
+
+	double b[8]={0};
+	b[0] = nodes_[0]->BODY[0];
+	b[1] = nodes_[0]->BODY[1];
+	b[2] = nodes_[1]->BODY[0];
+	b[3] = nodes_[1]->BODY[1];
+	b[4] = nodes_[2]->BODY[0];
+	b[5] = nodes_[2]->BODY[1];
+	b[6] = nodes_[3]->BODY[0];
+	b[7] = nodes_[3]->BODY[1];
+
+	double w[3] = {0};
+	double gp[3] = {0};
+	GaussianQuadrature Q4gauss;
+	Q4gauss.Gauss_Calculate();
+	unsigned int ngp = Q4gauss.ngp;
+	double be[2] = {0};
+	double F[8] = {0};
+
+	Calculate_detJ();
+
+	for(unsigned int i = 0;i<ngp;i++){
+		for(unsigned int j=0; j<ngp; j++){
+			Calculate_Nmat(gp[i],gp[j]);
+			for(unsigned int k=0;k<4;k=k+2){
+				be[0] += Nmat[k]*b[k];
+				be[1] += Nmat[k+1]*b[k+1];
+			}
+			for(unsigned int k=0;k<4;k=k+2){
+			F[k] += w[i]*w[j]*detJ[ngp*i+j]*(be[0]*Nmat[k]);
+			F[k+1] += w[i]*w[j]*detJ[ngp*i+j]*(be[1]*Nmat[k+1]);
+			}
+		}
+	}
+
+	unsigned int row[] = {0,1,3,4,6,7,9,10};
+	for(unsigned int i = 0;i<8;i++){
+		Force[row[i]] = F[i];
 	}
 }
