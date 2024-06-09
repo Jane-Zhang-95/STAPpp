@@ -1,52 +1,38 @@
 #pragma once
 
-#include "Outputter.h"
-
-using namespace std;
-
-//!	Material base class which only define one data member
-/*!	All type of material classes should be derived from this base class */
-class CGauss
-{
-public:
-
-	unsigned int ngp;	//!< Number of gauss point
+class GaussianQuadrature {
 
 public:
 
-//! Virtual deconstructor
-    virtual ~CGauss() {};
+	static unsigned int ngp;
 
-//!	Read material data from stream Input
-	virtual bool Read(ifstream& Input) = 0;
+	static double weights_1p[1];
 
-//!	Write material data to Stream
-    virtual void Write(COutputter& output) = 0;
+	static double points_1p[1];
+
+	static double weights_2p[2];
+
+	static double points_2p[2];
+
+	static double weights_3p[3];
+
+	static double points_3p[3];
+
+	double* g_w; //weight for gauss
+
+	double* g_p; // gauss point
+
+public:
+
+	GaussianQuadrature();
+
+	~GaussianQuadrature(){
+		if(g_w)
+			delete[] g_w;
+		if(g_p)
+			delete[] g_p;
+	}
+
+	void Gauss_Calculate();
 
 };
-
-//for T3
-class CT3Gauss : public CGauss
-{
-public:
-	double* csi; //gauss point
-    double* w;//weight
-
-public:
-//!	Constructor
-	CT3Gauss();
-
-//!	Desconstructor
-    ~CT3Gauss();
-
-//!	Read material data from stream Input
-	virtual bool Read(ifstream& Input);
-
-//!	Write material data to Stream
-	virtual void Write(COutputter& output);
-
-//
-    virtual void T3_GPoint();
-
-};
-

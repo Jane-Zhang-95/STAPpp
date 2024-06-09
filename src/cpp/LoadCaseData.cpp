@@ -23,6 +23,7 @@ CLoadCaseData :: ~CLoadCaseData()
 	delete [] dof;
 	delete [] load;
 	delete [] node_nbc;
+	delete [] dof_nbc;
 	delete [] nbc;
 }
 
@@ -34,8 +35,9 @@ void CLoadCaseData :: Allocate(unsigned int num_load, unsigned int num_nbc)
 	dof = new unsigned int[nloads];
 	load = new double[nloads];
 	nnbc = num_nbc;
-	node_nbc = new unsigned int[nnbc];
-	nbc = new double[nnbc];
+	node_nbc = new unsigned int[2*nnbc];
+	dof_nbc = new unsigned int[2*nnbc];
+	nbc = new double[2*nnbc];
 }; 
 
 //	Read load case data from stream Input
@@ -54,15 +56,15 @@ bool CLoadCaseData :: Read(ifstream& Input)
 	
 	int j = 0;
 	for (unsigned int i = 0; i < NNBC; i++){
-		Input >> node_nbc[j] >> node_nbc[j+1] >> dof_nbc[j] >> dof_nbc[j+1]>> nbc[j] >> nbc[j+1];
+		Input >> node_nbc[j] >> node_nbc[j+1] >> dof_nbc[j] >> nbc[j] >> nbc[j+1] >> Ele_num; //node1,node2,dof,nbc load1,load2,element
 		j = j+2;
 		
 		//require 2 dof are the same
-		if(dof_nbc[j]!=dof_nbc[j+1]){
-			cerr << "*** Error *** 2 dof should be the same for Natural Bounce Condition!" << endl
-			<< "    Wrong dof input : " << i+1 << endl;
-			return false;
-		}
+		//if(dof_nbc[j]!=dof_nbc[j+1]){
+			//cerr << "*** Error *** 2 dof should be the same for Natural Bounce Condition!" << endl
+			//<< "    Wrong dof input : " << i+1 << endl;
+			//return false;
+		//}
 	}
 
 	return true;
@@ -77,6 +79,9 @@ void CLoadCaseData::Write(COutputter& output) //output as a COutputter
 	int j;
 	j = 0;
 	for (unsigned int i = 0; i < nnbc; i++){
-		output << setw(7) << node_nbc[j] << setw(7) << node_nbc[j+1] << setw(13) << dof_nbc[j] << setw(7) << dof_nbc[j+1] << setw(19) << nbc[j] << setw(7) << nbc[j+1] << endl;
+		output << setw(7) << node_nbc[j] << setw(7) << node_nbc[j+1] << setw(13) << dof_nbc[j] << setw(19) 
+		<< nbc[j] << setw(9) << nbc[j+1] << setw(15) << Ele_num << endl;
+		j=j+2;
 	}
+	
 }

@@ -36,16 +36,16 @@ public:
 	virtual void Write(COutputter& output);
 
 //!	Calculate D
-	virtual void D_Elastic(CT3Material* material_);
+	virtual void D_Elastic(C2DMaterial* material_);
 
 //!	Calculate element stiffness matrix
 	virtual void ElementStiffness(double* Matrix);
 
 //! B matrix
-	virtual void BmatElast2D(CT3Material* material_);
+	virtual void BmatElast2D(C2DMaterial* material_);
 
 //! N matrix
-	virtual void NmatElast2D(double* Nmat, CT3Material* material_);
+	virtual void NmatElast2D(double* Nmat, C2DMaterial* material_);
 
 //!	Calculate element stress
 	virtual void ElementStress(double* stress, double* Displacement);

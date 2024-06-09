@@ -8,7 +8,6 @@
 /*     http://www.comdyn.cn/                                                 */
 /*****************************************************************************/
 
-
 #include "Material.h"
 
 #include <iostream>
@@ -20,18 +19,20 @@ using namespace std;
 //	Read material data from stream Input
 bool CBarMaterial::Read(ifstream& Input)
 {
-	Input >> nset;	// Number of property set 
+	Input >> nset;	// Number of property set
 
-	Input >> E >> Area;	// Young's modulus and section area 
+	Input >> E >> Area;	// Young's modulus and section area
 
 	return true;
 }
 
-bool CT3Material::Read(ifstream& Input)
+bool C2DMaterial::Read(ifstream& Input)
 {
 	Input >> nset;	// Number of property set
 
-	Input >> E >> nu >> h_T3 >> Stress_Mode;	// Young's modulus and section area
+	Input >> E >> mu >> thickness;	// Young's modulus, Poisson ratio and thickness of the plate
+
+	Input >> plane_stress;	// Plane stress indicator, True if plane stress, False if plane strain
 
 	return true;
 }
@@ -42,8 +43,7 @@ void CBarMaterial::Write(COutputter& output)
 	output << setw(16) << E << setw(16) << Area << endl;
 }
 
-//	Write material data to Stream 
-void CT3Material::Write(COutputter& output)
+void C2DMaterial::Write(COutputter& output)
 {
-	output << setw(16) << E << setw(16) << nu << setw(16) << h_T3 << setw(16) << Stress_Mode << endl;
+	output << setw(16) << E << setw(16) << mu << setw(16) << thickness << setw(12) << plane_stress << endl;
 }

@@ -59,7 +59,11 @@ void CElementGroup::CalculateMemberSize()
             break;
         case ElementTypes::T3:
             ElementSize_ = sizeof(CT3);
-            MaterialSize_ = sizeof(CT3Material);
+            MaterialSize_ = sizeof(C2DMaterial);
+            break;
+        case ElementTypes::Q4:
+            ElementSize_ = sizeof(CQ4);
+            MaterialSize_ = sizeof(C2DMaterial);
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not available. See CElementGroup::CalculateMemberSize." << std::endl;
@@ -79,6 +83,9 @@ void CElementGroup::AllocateElements(std::size_t size)
         case ElementTypes::T3:
             ElementList_ = new CT3[size];
             break;
+        case ElementTypes::Q4:
+            ElementList_ = new CQ4[size];
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not available. See CElementGroup::AllocateElement." << std::endl;
             exit(5);
@@ -94,7 +101,10 @@ void CElementGroup::AllocateMaterials(std::size_t size)
             MaterialList_ = new CBarMaterial[size];
             break;
         case ElementTypes::T3:
-            MaterialList_ = new CT3Material[size];
+            MaterialList_ = new C2DMaterial[size];
+            break;
+        case ElementTypes::Q4:
+            MaterialList_ = new C2DMaterial[size];
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not available. See CElementGroup::AllocateMaterial." << std::endl;

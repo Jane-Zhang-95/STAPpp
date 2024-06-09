@@ -53,29 +53,31 @@ public:
 	virtual void Write(COutputter& output);
 };
 
-class CT3Material : public CMaterial
+//! Material class for 2D plate element
+class C2DMaterial : public CMaterial
 {
 public:
 
-	unsigned int Stress_Mode; //plane stress or strain
-	double nu; //possion ratio nu
-	double h_T3; //element thickness
-	double Area; 
-	double* D; //DMatrix
-	// double Area_T3;	//!< Sectional area of a triangle element
+	double mu, thickness;	//!< Poisson ratio, Thickness
+
+	bool plane_stress;	//!< Plane stress = True, Plane strain = False 
+
+	double* D;
+
+	double Area;
 
 public:
 
-	//! Virtual deconstructor
-    virtual ~CT3Material() {
+	C2DMaterial(): D(nullptr){}
+
+	~C2DMaterial(){
 		if(D)
 			delete[] D;
-	};
-//!	Read material data from stream Input
+	}
+
+//! Read material data from stream Input
 	virtual bool Read(ifstream& Input);
 
-//!	Write material data to Stream
+//! Write material data to Stream
 	virtual void Write(COutputter& output);
-
-	virtual double Get_h() {return h_T3;};
 };

@@ -71,11 +71,11 @@ int main(int argc, char *argv[])
 	CLDLTSolver* Solver = new CLDLTSolver(FEMData->GetStiffnessMatrix()); 
       
     Solver->LDLT(); // 
-  
+
     #ifdef _DEBUG_ // if defined DEBUG 
         Output->PrintStiffnessMatrix(); 
     #endif
-             
+         
     for (unsigned int lcase = 0; lcase < FEMData->GetNLCASE(); lcase++)  
     {  
         FEMData->AssembleForce(lcase + 1);  

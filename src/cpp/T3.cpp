@@ -43,7 +43,7 @@ bool CT3::Read(ifstream& Input, CMaterial* MaterialSets, CNode* NodeList)
 	unsigned int N1, N2, N3;	// Left node number and right node number 
 
 	Input >> N1 >> N2 >> N3 >> MSet; 
-    ElementMaterial_ = dynamic_cast<CT3Material*>(MaterialSets) + MSet - 1; 
+    ElementMaterial_ = dynamic_cast<C2DMaterial*>(MaterialSets) + MSet - 1; 
 	nodes_[0] = &NodeList[N1 - 1]; 
 	nodes_[1] = &NodeList[N2 - 1];
 	nodes_[2] = &NodeList[N3 - 1];
@@ -59,42 +59,42 @@ void CT3::Write(COutputter& output)
 		   << setw(12) << ElementMaterial_->nset << endl;
 }
 
-void CT3::D_Elastic(CT3Material* material_)
+void CT3::D_Elastic(C2DMaterial* material_)
 {
-	unsigned int Mode = material_->Stress_Mode;
+	unsigned int Mode = material_->plane_stress;
 	double Elas[9] = {0};
 	if( Mode == 0 ) //stress
 	{
-		double k_stress = (material_->E) / (1.0 - (material_->nu)*(material_->nu) );
+		double k_stress = (material_->E) / (1.0 - (material_->mu)*(material_->mu) );
 		Elas[0] = k_stress * 1.0;
-		Elas[1] = k_stress * material_->nu;
+		Elas[1] = k_stress * material_->mu;
 		Elas[2] = 0;
-		Elas[3] = k_stress * material_->nu;
+		Elas[3] = k_stress * material_->mu;
 		Elas[4] = k_stress * 1.0;
 		Elas[5] = 0;
 		Elas[6] = 0;
 		Elas[7] = 0;
-		Elas[8] = k_stress * 0.5 * (1.0 - material_->nu);
+		Elas[8] = k_stress * 0.5 * (1.0 - material_->mu);
 	}
 	else if( Mode == 1 ) //strain
 	{
-		double k_strain = (material_->E) / (1.0 + material_->nu)*(1.0 - 2.0 * material_->nu) ;
-		Elas[0] = k_strain * (1.0 - material_->nu);
-		Elas[1] = k_strain * material_->nu;
+		double k_strain = (material_->E) / (1.0 + material_->mu)*(1.0 - 2.0 * material_->mu) ;
+		Elas[0] = k_strain * (1.0 - material_->mu);
+		Elas[1] = k_strain * material_->mu;
 		Elas[2] = 0;
-		Elas[3] = k_strain * material_->nu;
-		Elas[4] = k_strain * (1.0 - material_->nu);
+		Elas[3] = k_strain * material_->mu;
+		Elas[4] = k_strain * (1.0 - material_->mu);
 		Elas[5] = 0;
 		Elas[6] = 0;
 		Elas[7] = 0;
-		Elas[8] = k_strain * 0.5 * (1.0 - 2.0 * material_->nu);
+		Elas[8] = k_strain * 0.5 * (1.0 - 2.0 * material_->mu);
 	}
 	for(unsigned int i = 0;i<9;i++){
 		(material_->D)[i] = Elas[i];
 	}
 }
 
-void CT3::BmatElast2D(CT3Material* material_)
+void CT3::BmatElast2D(C2DMaterial* material_)
 {
 	double node0[2]={0,0};  
 	double node1[2]={0,0};
@@ -144,7 +144,7 @@ void CT3::BmatElast2D(CT3Material* material_)
 	}
 }
 
-void CT3::NmatElast2D(double* Nmat, CT3Material* material_)
+void CT3::NmatElast2D(double* Nmat, C2DMaterial* material_)
 {
 	double node0[2];  
 	double node1[2];
@@ -174,14 +174,14 @@ void CT3::ElementStiffness(double* Matrix)
 
 	//	Calculate element stiffness matrix
 
-	CT3Material* material_ = dynamic_cast<CT3Material*>(ElementMaterial_);	// Pointer to material of the element
+	C2DMaterial* material_ = dynamic_cast<C2DMaterial*>(ElementMaterial_);	// Pointer to material of the element
 	material_->D = new double[9];
 	(*this).Bmat = new double[18];
 	D_Elastic(material_);
 	BmatElast2D(material_);
 	double* Dmat = material_->D;
 	//AtBDB
-	double k = (material_->Area) * (material_->h_T3) ;
+	double k = (material_->Area) * (material_->thickness) ;
 	double M[36];
 
 	for(unsigned int i=0 ; i<36; i++){
@@ -244,7 +244,7 @@ void CT3::ElementForce(double* Force)
 void CT3::ElementStress(double* stress, double* Displacement)
 { //stress and dis
 	clear(stress,3);
-	CT3Material* material_ = dynamic_cast<CT3Material*>(ElementMaterial_);	// Pointer to material of the element
+	C2DMaterial* material_ = dynamic_cast<C2DMaterial*>(ElementMaterial_);	// Pointer to material of the element
 	Bmat = new double[18];	
 	BmatElast2D(material_);
 	double B[18] = {0};

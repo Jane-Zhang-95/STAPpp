@@ -1,70 +1,38 @@
+#include "Gauss.h"
 
-#include "gauss.h"
+unsigned int GaussianQuadrature::ngp = 2;
 
-#include <iostream>
-#include <fstream>
-#include <iomanip>
+double GaussianQuadrature::weights_1p[1] = { 2.0 };
+double GaussianQuadrature::points_1p[1] = { 0.0 };
 
-using namespace std;
+double GaussianQuadrature::weights_2p[2] = { 1.0, 1.0 };
+double GaussianQuadrature::points_2p[2] = { -0.57735026919, 0.57735026919 };
 
-//CT3
+double GaussianQuadrature::weights_3p[3] = { 0.555555555556, 0.888888888889, 0.555555555556 };
+double GaussianQuadrature::points_3p[3] = { -0.77459666924, 0.0, 0.77459666924 };
 
-//!	Constructor
-CT3Gauss::CT3Gauss(){}
-    
-//!	Desconstructor
-CT3Gauss::~CT3Gauss(){
-        if (w)
-            delete [] w;
-        if (csi)
-            delete [] csi;
+GaussianQuadrature::GaussianQuadrature(){
+    g_p = new double[ngp];
+    g_w = new double[ngp];
 }
 
-//	Read ngp data from stream Input
-bool CT3Gauss::Read(ifstream& Input)
-{
-	Input >> ngp;	// Number of property set
-
-	return true;
-}
-
-//	Write ngp data to Stream 输出ngp
-void CT3Gauss::Write(COutputter& output)
-{
-	output << setw(16) << ngp << endl;
-}
-
-void CT3Gauss::T3_GPoint()
-{
-    csi,w = new double[3];
-    switch(ngp)
-    {
-        case 1:
-            csi[0] = 0.333333333;
-			csi[1] = 0.333333333;
-			csi[2] = 0.333333333;
-            w[0] = 0.5;
-			w[1] = 0.5;
-			w[2] = 0.5;
-            break;
-        case 2:
-            csi[0] = 0.666666667;
-			csi[1] = 0.166666667;
-			csi[2] = 0.166666667;
-            w[0] = 0.166666667;
-			w[1] = 0.166666667;
-			w[2] = 0.166666667;
-            break;
-        case 3:
-            csi[0] = 0.5;
-			csi[1] = 0.5;
-			csi[2] = 0.0;
-            w[0] = 0.166666667;
-			w[1] = 0.166666667;
-			w[2] = 0.166666667;
-            break;
-        default:
-            std::cerr << "ngp " << ngp << " not available.." << std::endl;
-            exit(5);
+void GaussianQuadrature::Gauss_Calculate(){
+    if(ngp == 1){
+        g_w[0] =  weights_1p[0];
+        g_p[0] =  points_1p[0];
+    }
+    else if(ngp == 2){
+        g_w[0] =  weights_2p[0];
+        g_w[1] =  weights_2p[1];
+        g_p[0] =  points_2p[0];
+        g_p[1] =  points_2p[1];
+    }
+    else if(ngp == 3){
+        g_w[0] =  weights_3p[0];
+        g_w[1] =  weights_3p[1];
+        g_w[2] =  weights_3p[2];
+        g_p[0] =  points_3p[0];
+        g_p[1] =  points_3p[1];
+        g_p[2] =  points_3p[2];
     }
 }

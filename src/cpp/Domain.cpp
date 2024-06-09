@@ -12,7 +12,9 @@
 #include "Material.h"
 #include "ElementGroup.h"
 #include "gauss.h"
-
+#include "T3.h"
+#include "Q4.h"
+#include <math.h>
 
 using namespace std;
 
@@ -299,6 +301,10 @@ void CDomain::AssembleStiffnessMatrix()
             Element.ElementStiffness(Matrix); 
             StiffnessMatrix->Assembly(Matrix, Element.GetLocationMatrix(), Element.GetND()); 
         }  
+
+        //std::cout<<Matrix[0]<<" "<<Matrix[1]<<" "<<Matrix[2]<<" "<<Matrix[3]<<" "<<Matrix[4]
+        //<<" "<<Matrix[5]<<" "<<Matrix[6]<<" "<<Matrix[7]<<" "<<Matrix[8]
+        //<<endl;
            
         delete[] Matrix;  
         Matrix = nullptr;  
@@ -349,7 +355,7 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                 for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum=lnum+2) //2 points at a time 
                 {  
                     unsigned int dof1 = NodeList[LoadData->node_nbc[lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
-                    unsigned int dof2 = NodeList[LoadData->node_nbc[lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum+1] - 1]; //right
+                    unsigned int dof2 = NodeList[LoadData->node_nbc[lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
                     //length
                     double DX[2];
                     DX[0] = NodeList[LoadData->node_nbc[lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[lnum+1] - 1].XYZ[0];
@@ -361,8 +367,8 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                     double L = sqrt(L2); //length
                 
                     CMaterial& Mat = ElementGrp.GetMaterial(i);
-                    CT3Material& CT3mat = static_cast<CT3Material&>(Mat);
-                    double h = CT3mat.h_T3;
+                    C2DMaterial& CT3mat = static_cast<C2DMaterial&>(Mat);
+                    double h = CT3mat.thickness;
                     //ElementGrp.GetMaterial
                     
                     if(dof1){ // The DOF is activated  
@@ -393,7 +399,6 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                     CNode* Node1 = ElementNode[1];
                     CNode* Node2 = ElementNode[2];
                     unsigned int dof[9] ={0};
-                    double body[9] ={0};
                     dof[0] = NodeList[Node0->NodeNumber - 1].bcode_[0]; //1x
                     dof[1] = NodeList[Node0->NodeNumber - 1].bcode_[1]; 
                     dof[3] = NodeList[Node1->NodeNumber - 1].bcode_[0]; 
@@ -409,6 +414,97 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                     F = nullptr;
                 }
             break;
+
+            case ElementTypes::Q4: 
+            //force
+                for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)  
+                {   
+                    unsigned int dof = NodeList[LoadData->node_load[lnum] - 1].bcode_[LoadData->dof[lnum] - 1];  
+                    
+                    if(dof) // The DOF is activated  
+                        Force[dof - 1] += LoadData->load[lnum];  
+                }
+            //naturla bc
+                for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum=lnum+2) //2 points at a time 
+                {  
+                    unsigned int dof1 = NodeList[LoadData->node_nbc[lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
+                    unsigned int dof2 = NodeList[LoadData->node_nbc[lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
+                    //length
+                    double DX[2];
+                    DX[0] = NodeList[LoadData->node_nbc[lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[lnum+1] - 1].XYZ[0];
+                    DX[1] = NodeList[LoadData->node_nbc[lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[lnum+1] - 1].XYZ[1];
+                    double DX2[2];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
+                    DX2[0] = DX[0] * DX[0];
+                    DX2[1] = DX[1] * DX[1];
+                    double L2 = DX2[0] + DX2[1];
+                    double L = sqrt(L2); //length
+                    double J = L/2;
+                    CMaterial& Mat = ElementGrp.GetMaterial(i);
+                    C2DMaterial& CQ4mat = static_cast<C2DMaterial&>(Mat);
+                    unsigned int Elenum = LoadData->Ele_num;
+
+                    CElement& Element = ElementGrp[Elenum-1]; //CElement
+                    CQ4& Q4Element = dynamic_cast<CQ4&>(Element); //turn to CQ4
+
+                    double* Fbc = new double[2];
+                    
+                    double t1 = LoadData->nbc[lnum];
+                    double t2 = LoadData->nbc[lnum+1];
+
+                    Q4Element.Calculate_NBC(Fbc, t1, t2);
+                    //ElementGrp.GetMaterial
+                    
+
+                    if(dof1){ // The left DOF is activated  
+                        Force[dof1 - 1] += J*Fbc[0]; 
+                    }
+                    if(dof2){ // The right DOF is activated  
+                        Force[dof2 - 1] += J*Fbc[1];
+                    }
+                    delete[] Fbc;
+                    Fbc = nullptr;
+                    //std::cout<<Force[0]<<Force[1]<<Force[2]<<Force[3]<<endl;
+                } 
+            //body force
+                for (unsigned int Ele = 0; Ele < NUME; Ele++)  
+                {   
+                    CElement& Element = ElementGrp[Ele]; //CElement
+                    CQ4& Q4Element = dynamic_cast<CQ4&>(Element); //turn to CQ4
+                    //std::cout<<size<<endl;
+                    CMaterial& Mat = ElementGrp.GetMaterial(i);
+                    C2DMaterial& CQ4mat = static_cast<C2DMaterial&>(Mat);
+
+                    unsigned int size = 12;
+                    double* F = new double[size];
+
+                    Q4Element.Calculate_BODY(F);
+
+                    //std::cout<<F[0]<<F[1]<<endl;
+                    CNode** ElementNode = Element.GetNodes(); //4 points in element
+                    CNode* Node0 = ElementNode[0];//3 nodes
+                    CNode* Node1 = ElementNode[1];
+                    CNode* Node2 = ElementNode[2];
+                    CNode* Node3 = ElementNode[3];
+                    unsigned int dof[12] ={0};
+
+                    dof[0] = NodeList[Node0->NodeNumber - 1].bcode_[0]; //1x
+                    dof[1] = NodeList[Node0->NodeNumber - 1].bcode_[1]; 
+                    dof[3] = NodeList[Node1->NodeNumber - 1].bcode_[0]; 
+                    dof[4] = NodeList[Node1->NodeNumber - 1].bcode_[1]; 
+                    dof[6] = NodeList[Node2->NodeNumber - 1].bcode_[0];
+                    dof[7] = NodeList[Node2->NodeNumber - 1].bcode_[1];
+                    dof[9] = NodeList[Node3->NodeNumber - 1].bcode_[0];
+                    dof[10] = NodeList[Node3->NodeNumber - 1].bcode_[1];
+
+                    for( int i = 0; i<12 ; i++){
+                        if(dof[i]) 
+                            Force[dof[i] - 1] += F[i]; 
+                    }
+                    delete[] F;
+                    F = nullptr;
+                }
+                
+                break;
 
             default: //error
                     std::cerr << "NDF Do not fit CNode::Read." << std::endl;

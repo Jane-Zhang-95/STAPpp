@@ -27,23 +27,12 @@ public:
 	unsigned int* node_nbc;
 	unsigned int* dof_nbc;
 	double* nbc;
+	unsigned int Ele_num;
 
 public:
 
-	CLoadCaseData():nloads(0),nnbc(0),node_load(new unsigned int[20]),dof(new unsigned int[20]),load(new double[20]),
-	node_nbc(new unsigned int[20]),dof_nbc(new unsigned int[20]),nbc(new double[20])
-	{
-	for (unsigned int i = 0; i < 20; ++i) {
-            node_load[i] = 0;
-            dof[i] = 0;
-            load[i] = 0.0;
-        }
-        for (unsigned int i = 0; i < 20; ++i) {
-            node_nbc[i] = 0;
-            dof_nbc[i] = 0;
-            nbc[i] = 0.0;
-        }
-	};
+	CLoadCaseData():nloads(0),nnbc(0),Ele_num(0),node_load(nullptr),dof(nullptr),load(nullptr),
+	node_nbc(nullptr),dof_nbc(nullptr),nbc(nullptr){};
 
 	~CLoadCaseData();
 
