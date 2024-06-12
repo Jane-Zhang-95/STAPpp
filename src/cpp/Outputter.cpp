@@ -327,10 +327,11 @@ void COutputter::OutputLoadInfo()
 			  << endl;
 
 		*this << "     LOAD CASE NUMBER . . . . . . . =" << setw(6) << lcase << endl;
-		*this << "     NUMBER OF CONCENTRATED LOADS . =" << setw(6) << LoadData->nloads << endl
+		*this << "     NUMBER OF CONCENTRATED LOADS . =" << setw(6) << LoadData->nloads << endl;
+		*this << "     NUMBER OF NATURAL BC . =" << setw(6) << LoadData->nnbc << endl
 			  << endl;
-		*this << "    NODE       DIRECTION      LOAD" << endl
-			  << "   NUMBER                   MAGNITUDE" << endl;
+		*this << "    NODE          DIRECTION         LOAD            ELEMENT" << endl
+			  << "   NUMBER                         MAGNITUDE         NUMBER" << endl;
 
 		LoadData->Write(*this);
 

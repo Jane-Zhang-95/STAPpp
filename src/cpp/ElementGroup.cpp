@@ -135,6 +135,8 @@ bool CElementGroup::Read(ifstream& Input)
         
             return false;
         }
+        //GetMaterial(mset).nset += 
+        
     }
 
 //  Read element data lines

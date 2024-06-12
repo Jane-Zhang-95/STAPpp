@@ -28,10 +28,11 @@ public:
 	unsigned int* dof_nbc;
 	double* nbc;
 	unsigned int Ele_num;
+	unsigned int EleGrp_num;
 
 public:
 
-	CLoadCaseData():nloads(0),nnbc(0),Ele_num(0),node_load(nullptr),dof(nullptr),load(nullptr),
+	CLoadCaseData():nloads(0),nnbc(0),Ele_num(0),EleGrp_num(0),node_load(nullptr),dof(nullptr),load(nullptr),
 	node_nbc(nullptr),dof_nbc(nullptr),nbc(nullptr){};
 
 	~CLoadCaseData();

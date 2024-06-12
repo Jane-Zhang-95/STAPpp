@@ -55,7 +55,7 @@ bool CLoadCaseData :: Read(ifstream& Input)
 		Input >> node_load[i] >> dof[i] >> load[i];
 
 	for (unsigned int i = 0; i < NNBC; i++){
-		Input >> node_nbc[2*i] >> node_nbc[2*i+1] >> dof_nbc[i] >> nbc[2*i] >> nbc[2*i+1] >> Ele_num; //node1,node2,dof,nbc load1,load2,element
+		Input >> node_nbc[2*i] >> node_nbc[2*i+1] >> dof_nbc[i] >> nbc[2*i] >> nbc[2*i+1] >> EleGrp_num >> Ele_num; //node1,node2,dof,nbc load1,load2,element
 		
 		//require 2 dof are the same
 		//if(dof_nbc[j]!=dof_nbc[j+1]){
@@ -72,14 +72,11 @@ bool CLoadCaseData :: Read(ifstream& Input)
 void CLoadCaseData::Write(COutputter& output) //output as a COutputter
 {
 	for (unsigned int i = 0; i < nloads; i++){
-		output << setw(7) << node_load[i] << setw(13) << dof[i]  << setw(19) << load[i] << endl; 
+		output << setw(17) << node_load[i] << setw(13) << dof[i]  << setw(19) << load[i] << endl; 
 	}
-	int j;
-	j = 0;
 	for (unsigned int i = 0; i < nnbc; i++){
-		output << setw(7) << node_nbc[j] << setw(7) << node_nbc[j+1] << setw(13) << dof_nbc[j] << setw(19) 
-		<< nbc[j] << setw(9) << nbc[j+1] << setw(15) << Ele_num << endl;
-		j=j+2;
+		output << setw(7) << node_nbc[2*i] << setw(3) << node_nbc[2*i+1] << setw(7) << dof_nbc[i] << setw(19) 
+		<< nbc[2*i] << setw(13) << nbc[2*i+1] << setw(9) << Ele_num << endl;
 	}
 	
 }

@@ -209,7 +209,7 @@ bool CDomain::ReadElements()
     {  
         if (!EleGrpList[EleGrp].Read(Input))  
             return false;  
-    }   
+    }
     return true;  
 }
 
@@ -324,9 +324,9 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 	CLoadCaseData* LoadData = &LoadCases[LoadCase - 1];  
    
     clear(Force, NEQ);
-    for(unsigned int i = 0; i<NUMEG; i++){
+    for(unsigned int grpnum = 0; grpnum<NUMEG; grpnum++){
         
-        CElementGroup& ElementGrp = EleGrpList[i];
+        CElementGroup& ElementGrp = EleGrpList[grpnum];
         ElementTypes ElementType = ElementGrp.GetElementType(); //get Element Type
         unsigned int NUME = ElementGrp.GetNUME();//get NUME
         switch (ElementType)  
@@ -352,37 +352,39 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                         Force[dof - 1] += LoadData->load[lnum];  
                 }
             //naturla bc
-                for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum++) //2 points at a time 
-                {  
-                    unsigned int dof1 = NodeList[LoadData->node_nbc[2*lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
-                    unsigned int dof2 = NodeList[LoadData->node_nbc[2*lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
-                    //length
-                    double DX[2];
-                    DX[0] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[0];
-                    DX[1] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[1];
-                    double DX2[2];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
-                    DX2[0] = DX[0] * DX[0];
-                    DX2[1] = DX[1] * DX[1];
-                    double L2 = DX2[0] + DX2[1];
-                    double L = sqrt(L2); //length
-                
-                    CMaterial& Mat = ElementGrp.GetMaterial(i);
-                    C2DMaterial& CT3mat = static_cast<C2DMaterial&>(Mat);
-                    double h = CT3mat.thickness;
-                    //ElementGrp.GetMaterial
+                if(!(LoadData->EleGrp_num - grpnum - 1)){
+                    for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum++) //2 points at a time 
+                    {  
+                        unsigned int dof1 = NodeList[LoadData->node_nbc[2*lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
+                        unsigned int dof2 = NodeList[LoadData->node_nbc[2*lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
+                        //length
+                        double DX[2];
+                        DX[0] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[0];
+                        DX[1] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[1];
+                        double DX2[2];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
+                        DX2[0] = DX[0] * DX[0];
+                        DX2[1] = DX[1] * DX[1];
+                        double L2 = DX2[0] + DX2[1];
+                        double L = sqrt(L2); //length
                     
-                    if(dof1){ // The DOF is activated  
-                        double t1 = LoadData->nbc[2*lnum];
-                        double t2 = LoadData->nbc[2*lnum+1];
-                        Force[dof1 - 1] += h*L*(2*t1+t2)/6; 
-                    }
-                    if(dof2){ // The DOF is activated  
-                        double t1 = LoadData->nbc[2*lnum];
-                        double t2 = LoadData->nbc[2*lnum+1]; 
-                        Force[dof2 - 1] += h*L*(2*t2+t1)/6;
-                    }
-                    
-                } 
+                        CMaterial& Mat = ElementGrp.GetMaterial(grpnum);
+                        C2DMaterial& CT3mat = static_cast<C2DMaterial&>(Mat);
+                        double h = CT3mat.thickness;
+                        //ElementGrp.GetMaterial
+                        
+                        if(dof1){ // The DOF is activated  
+                            double t1 = LoadData->nbc[2*lnum];
+                            double t2 = LoadData->nbc[2*lnum+1];
+                            Force[dof1 - 1] += h*L*(2*t1+t2)/6; 
+                        }
+                        if(dof2){ // The DOF is activated  
+                            double t1 = LoadData->nbc[2*lnum];
+                            double t2 = LoadData->nbc[2*lnum+1]; 
+                            Force[dof2 - 1] += h*L*(2*t2+t1)/6;
+                        }
+                        
+                    } 
+                }
             //body force
                 for (unsigned int Ele = 0; Ele < NUME; Ele++)  
                 {   
@@ -425,53 +427,55 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                         Force[dof - 1] += LoadData->load[lnum];  
                 }
             //naturla bc
-                for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum++) //2 points at a time 
-                {  
-                    unsigned int dof1 = NodeList[LoadData->node_nbc[2*lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
-                    unsigned int dof2 = NodeList[LoadData->node_nbc[2*lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
-                    //length
-                    double DX[2];
-                    DX[0] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[0];
-                    DX[1] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[1];
-                    double DX2[2];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
-                    DX2[0] = DX[0] * DX[0];
-                    DX2[1] = DX[1] * DX[1];
-                    double L2 = DX2[0] + DX2[1];
-                    double L = sqrt(L2); //length
-                    double J = L/2;
-                    CMaterial& Mat = ElementGrp.GetMaterial(i);
-                    C2DMaterial& CQ4mat = static_cast<C2DMaterial&>(Mat);
-                    unsigned int Elenum = LoadData->Ele_num;
+                if(!(LoadData->EleGrp_num - grpnum - 1)){
+                    for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum++) //2 points at a time 
+                    {  
+                        unsigned int dof1 = NodeList[LoadData->node_nbc[2*lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
+                        unsigned int dof2 = NodeList[LoadData->node_nbc[2*lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
+                        //length
+                        double DX[2];
+                        DX[0] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[0];
+                        DX[1] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[1];
+                        double DX2[2];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
+                        DX2[0] = DX[0] * DX[0];
+                        DX2[1] = DX[1] * DX[1];
+                        double L2 = DX2[0] + DX2[1];
+                        double L = sqrt(L2); //length
+                        double J = L/2;
+                        CMaterial& Mat = ElementGrp.GetMaterial(grpnum);
+                        C2DMaterial& CQ4mat = static_cast<C2DMaterial&>(Mat);
+                        unsigned int Elenum = LoadData->Ele_num;
 
-                    CElement& Element = ElementGrp[Elenum-1]; //CElement
-                    CQ4& Q4Element = dynamic_cast<CQ4&>(Element); //turn to CQ4
+                        CElement& Element = ElementGrp[Elenum-1]; //CElement
+                        CQ4& Q4Element = dynamic_cast<CQ4&>(Element); //turn to CQ4
 
-                    double* Fbc = new double[2];
-                    
-                    double t1 = LoadData->nbc[2*lnum];
-                    double t2 = LoadData->nbc[2*lnum+1];
+                        double* Fbc = new double[2];
+                        
+                        double t1 = LoadData->nbc[2*lnum];
+                        double t2 = LoadData->nbc[2*lnum+1];
 
-                    Q4Element.Calculate_NBC(Fbc, t1, t2);
-                    //ElementGrp.GetMaterial
-                    
+                        Q4Element.Calculate_NBC(Fbc, t1, t2);
+                        //ElementGrp.GetMaterial
+                        
 
-                    if(dof1){ // The left DOF is activated  
-                        Force[dof1 - 1] += J*Fbc[0]; 
-                    }
-                    if(dof2){ // The right DOF is activated  
-                        Force[dof2 - 1] += J*Fbc[1];
-                    }
-                    delete[] Fbc;
-                    Fbc = nullptr;
-                    //std::cout<<Force[0]<<Force[1]<<Force[2]<<Force[3]<<endl;
-                } 
+                        if(dof1){ // The left DOF is activated  
+                            Force[dof1 - 1] += J*Fbc[0]; 
+                        }
+                        if(dof2){ // The right DOF is activated  
+                            Force[dof2 - 1] += J*Fbc[1];
+                        }
+                        delete[] Fbc;
+                        Fbc = nullptr;
+                        //std::cout<<Force[0]<<Force[1]<<Force[2]<<Force[3]<<endl;
+                    } 
+                }
             //body force
                 for (unsigned int Ele = 0; Ele < NUME; Ele++)  
                 {   
                     CElement& Element = ElementGrp[Ele]; //CElement
                     CQ4& Q4Element = dynamic_cast<CQ4&>(Element); //turn to CQ4
                     //std::cout<<size<<endl;
-                    CMaterial& Mat = ElementGrp.GetMaterial(i);
+                    CMaterial& Mat = ElementGrp.GetMaterial(grpnum);
                     C2DMaterial& CQ4mat = static_cast<C2DMaterial&>(Mat);
 
                     unsigned int size = 12;

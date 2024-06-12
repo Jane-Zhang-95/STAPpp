@@ -56,6 +56,7 @@ private:
     //! Number of material/section property sets in this group
     unsigned int NUMMAT_;
 
+
     //! Material list in this group
     CMaterial* MaterialList_;
 
