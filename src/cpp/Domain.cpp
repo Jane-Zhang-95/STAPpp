@@ -352,14 +352,14 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                         Force[dof - 1] += LoadData->load[lnum];  
                 }
             //naturla bc
-                for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum=lnum+2) //2 points at a time 
+                for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum++) //2 points at a time 
                 {  
-                    unsigned int dof1 = NodeList[LoadData->node_nbc[lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
-                    unsigned int dof2 = NodeList[LoadData->node_nbc[lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
+                    unsigned int dof1 = NodeList[LoadData->node_nbc[2*lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
+                    unsigned int dof2 = NodeList[LoadData->node_nbc[2*lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
                     //length
                     double DX[2];
-                    DX[0] = NodeList[LoadData->node_nbc[lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[lnum+1] - 1].XYZ[0];
-                    DX[1] = NodeList[LoadData->node_nbc[lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[lnum+1] - 1].XYZ[1];
+                    DX[0] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[0];
+                    DX[1] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[1];
                     double DX2[2];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
                     DX2[0] = DX[0] * DX[0];
                     DX2[1] = DX[1] * DX[1];
@@ -372,13 +372,13 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                     //ElementGrp.GetMaterial
                     
                     if(dof1){ // The DOF is activated  
-                        double t1 = LoadData->nbc[lnum];
-                        double t2 = LoadData->nbc[lnum+1];
+                        double t1 = LoadData->nbc[2*lnum];
+                        double t2 = LoadData->nbc[2*lnum+1];
                         Force[dof1 - 1] += h*L*(2*t1+t2)/6; 
                     }
                     if(dof2){ // The DOF is activated  
-                        double t1 = LoadData->nbc[lnum];
-                        double t2 = LoadData->nbc[lnum+1]; 
+                        double t1 = LoadData->nbc[2*lnum];
+                        double t2 = LoadData->nbc[2*lnum+1]; 
                         Force[dof2 - 1] += h*L*(2*t2+t1)/6;
                     }
                     
@@ -425,14 +425,14 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                         Force[dof - 1] += LoadData->load[lnum];  
                 }
             //naturla bc
-                for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum=lnum+2) //2 points at a time 
+                for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum++) //2 points at a time 
                 {  
-                    unsigned int dof1 = NodeList[LoadData->node_nbc[lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
-                    unsigned int dof2 = NodeList[LoadData->node_nbc[lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
+                    unsigned int dof1 = NodeList[LoadData->node_nbc[2*lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
+                    unsigned int dof2 = NodeList[LoadData->node_nbc[2*lnum+1] - 1].bcode_[LoadData->dof_nbc[lnum] - 1]; //right
                     //length
                     double DX[2];
-                    DX[0] = NodeList[LoadData->node_nbc[lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[lnum+1] - 1].XYZ[0];
-                    DX[1] = NodeList[LoadData->node_nbc[lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[lnum+1] - 1].XYZ[1];
+                    DX[0] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[0] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[0];
+                    DX[1] = NodeList[LoadData->node_nbc[2*lnum] - 1].XYZ[1] - NodeList[LoadData->node_nbc[2*lnum+1] - 1].XYZ[1];
                     double DX2[2];	//  Quadratic polynomial (dx^2, dy^2, dz^2, dx*dy, dy*dz, dx*dz)
                     DX2[0] = DX[0] * DX[0];
                     DX2[1] = DX[1] * DX[1];
@@ -448,8 +448,8 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
 
                     double* Fbc = new double[2];
                     
-                    double t1 = LoadData->nbc[lnum];
-                    double t2 = LoadData->nbc[lnum+1];
+                    double t1 = LoadData->nbc[2*lnum];
+                    double t2 = LoadData->nbc[2*lnum+1];
 
                     Q4Element.Calculate_NBC(Fbc, t1, t2);
                     //ElementGrp.GetMaterial

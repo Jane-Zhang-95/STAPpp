@@ -14,6 +14,7 @@ public:
 	double* detJ;
 
 public:
+
 //! Constructor
 	CQ4();
 

@@ -53,11 +53,9 @@ bool CLoadCaseData :: Read(ifstream& Input)
 	Allocate(NL, NNBC); //load number in this one
 	for (unsigned int i = 0; i < NL; i++)
 		Input >> node_load[i] >> dof[i] >> load[i];
-	
-	int j = 0;
+
 	for (unsigned int i = 0; i < NNBC; i++){
-		Input >> node_nbc[j] >> node_nbc[j+1] >> dof_nbc[j] >> nbc[j] >> nbc[j+1] >> Ele_num; //node1,node2,dof,nbc load1,load2,element
-		j = j+2;
+		Input >> node_nbc[2*i] >> node_nbc[2*i+1] >> dof_nbc[i] >> nbc[2*i] >> nbc[2*i+1] >> Ele_num; //node1,node2,dof,nbc load1,load2,element
 		
 		//require 2 dof are the same
 		//if(dof_nbc[j]!=dof_nbc[j+1]){
