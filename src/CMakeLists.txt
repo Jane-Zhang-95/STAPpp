@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.1)
 PROJECT(stap++)
+
+cmake_minimum_required(VERSION 3.1)
 set (CMAKE_CXX_STANDARD 11)
 
 OPTION(STAP++_DEBUG "Output detailed results for debugging." OFF)
@@ -16,5 +17,3 @@ source_group(SOURCE\ FILES FILES ${SRC})
 source_group(HEADER\ FILES FILES ${HEAD})
 
 ADD_EXECUTABLE(stap++ ${SRC} ${HEAD})
-
-add_compile_options("$<$<C_COMPILER_ID:MSVC>:/source-charset:utf-8>")
