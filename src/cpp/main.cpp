@@ -69,6 +69,8 @@ int main(int argc, char *argv[])
     double time_assemble = timer.ElapsedTime(); 
     
 	CLDLTSolver* Solver = new CLDLTSolver(FEMData->GetStiffnessMatrix()); 
+
+
       
     Solver->LDLT(); // 
 

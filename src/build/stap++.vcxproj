@@ -329,6 +329,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="D:\FEMSoftware11\STAPpp-master\src\cpp\Q4.cpp" />
     <ClCompile Include="D:\FEMSoftware11\STAPpp-master\src\cpp\Solver.cpp" />
     <ClCompile Include="D:\FEMSoftware11\STAPpp-master\src\cpp\T3.cpp" />
+    <ClCompile Include="D:\FEMSoftware11\STAPpp-master\src\cpp\Tet4.cpp" />
     <ClCompile Include="D:\FEMSoftware11\STAPpp-master\src\cpp\main.cpp" />
     <ClInclude Include="D:\FEMSoftware11\STAPpp-master\src\h\Bar.h" />
     <ClInclude Include="D:\FEMSoftware11\STAPpp-master\src\h\Clock.h" />
@@ -344,6 +345,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\FEMSoftware11\STAPpp-master\src\h\SkylineMatrix.h" />
     <ClInclude Include="D:\FEMSoftware11\STAPpp-master\src\h\Solver.h" />
     <ClInclude Include="D:\FEMSoftware11\STAPpp-master\src\h\T3.h" />
+    <ClInclude Include="D:\FEMSoftware11\STAPpp-master\src\h\Tet4.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:\FEMSoftware11\STAPpp-master\src\build\ZERO_CHECK.vcxproj">

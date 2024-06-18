@@ -81,3 +81,29 @@ public:
 //! Write material data to Stream
 	virtual void Write(COutputter& output);
 };
+
+class C3DMaterial : public CMaterial
+{
+public:
+
+	double mu;	//!< Poisson ratio, Thickness
+
+	double* D;
+
+	double Area;
+
+public:
+
+	C3DMaterial(): D(nullptr){}
+
+	~C3DMaterial(){
+		if(D)
+			delete[] D;
+	}
+
+//! Read material data from stream Input
+	virtual bool Read(ifstream& Input);
+
+//! Write material data to Stream
+	virtual void Write(COutputter& output);
+};

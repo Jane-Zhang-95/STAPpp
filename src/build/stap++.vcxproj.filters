@@ -37,6 +37,9 @@
     <ClCompile Include="D:\FEMSoftware11\STAPpp-master\src\cpp\T3.cpp">
       <Filter>SOURCE FILES</Filter>
     </ClCompile>
+    <ClCompile Include="D:\FEMSoftware11\STAPpp-master\src\cpp\Tet4.cpp">
+      <Filter>SOURCE FILES</Filter>
+    </ClCompile>
     <ClCompile Include="D:\FEMSoftware11\STAPpp-master\src\cpp\main.cpp">
       <Filter>SOURCE FILES</Filter>
     </ClCompile>
@@ -82,6 +85,9 @@
       <Filter>HEADER FILES</Filter>
     </ClInclude>
     <ClInclude Include="D:\FEMSoftware11\STAPpp-master\src\h\T3.h">
+      <Filter>HEADER FILES</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\FEMSoftware11\STAPpp-master\src\h\Tet4.h">
       <Filter>HEADER FILES</Filter>
     </ClInclude>
   </ItemGroup>

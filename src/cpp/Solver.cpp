@@ -21,12 +21,15 @@ using namespace std;
 // LDLT facterization
 void CLDLTSolver::LDLT()  
 {  
-	unsigned int N = K.dim();  
+	unsigned int N = K.dim(); 
+	//std::cout<<N<<endl;
       
     unsigned int* ColumnHeights = K.GetColumnHeights();   // Column Hights  
   
 	for (unsigned int j = 2; j <= N; j++)      // Loop for column 2:n (Numbering starting from 1)  
 	{  
+		//std::cout<<"^^ "<<K(j,j)<<endl;
+		
 		unsigned int mj = j - ColumnHeights[j-1];  
            
 		for (unsigned int i = mj+1; i <= j-1; i++)	// Loop for mj+1:j-1 (Numbering starting from 1)  
@@ -45,10 +48,10 @@ void CLDLTSolver::LDLT()
 		{  
 			double Lrj = K(r,j) / K(r,r);	// L_rj = U_rj / D_rr  
   
-            //D_jj = K_jj - sum(L_rj*U_rj, r=mj:j-1)  
-			K(j,j) -= Lrj * K(r,j);	// D_jj = K_jj - sum(L_rj*U_rj, r=mj:j-1)  
-  
+			K(j,j) -= Lrj * K(r,j);	// D_jj = K_jj - sum(L_rj*U_rj, r=mj:j-1)
+			//std::cout<<K(j,j)<<endl;
 			K(r,j) = Lrj;  
+			//std::cout<<K(j,j)<<endl;
 		}  
   
         if (fabs(K(j,j)) <= FLT_MIN)  
