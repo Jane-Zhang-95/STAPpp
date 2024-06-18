@@ -37,6 +37,15 @@ bool C2DMaterial::Read(ifstream& Input)
 	return true;
 }
 
+bool C3DMaterial::Read(ifstream& Input)
+{
+	Input >> nset;	// Number of property set
+
+	Input >> E >> mu;	// Young's modulus, Poisson ratio and thickness of the plate
+
+	return true;
+}
+
 //	Write material data to Stream
 void CBarMaterial::Write(COutputter& output)
 {
@@ -46,4 +55,9 @@ void CBarMaterial::Write(COutputter& output)
 void C2DMaterial::Write(COutputter& output)
 {
 	output << setw(16) << E << setw(16) << mu << setw(16) << thickness << setw(12) << plane_stress << endl;
+}
+
+void C3DMaterial::Write(COutputter& output)
+{
+	output << setw(16) << E << setw(16) << mu << setw(16) << endl;
 }

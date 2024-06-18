@@ -75,7 +75,7 @@ void CLoadCaseData::Write(COutputter& output) //output as a COutputter
 		output << setw(17) << node_load[i] << setw(13) << dof[i]  << setw(19) << load[i] << endl; 
 	}
 	for (unsigned int i = 0; i < nnbc; i++){
-		output << setw(7) << node_nbc[2*i] << setw(3) << node_nbc[2*i+1] << setw(7) << dof_nbc[i] << setw(19) 
+		output << setw(4) << node_nbc[2*i] << setw(6) << node_nbc[2*i+1] << setw(7) << dof_nbc[i] << setw(19) 
 		<< nbc[2*i] << setw(13) << nbc[2*i+1] << setw(9) << Ele_num << endl;
 	}
 	
