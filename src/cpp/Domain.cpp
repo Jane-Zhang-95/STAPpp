@@ -529,7 +529,7 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                 for (unsigned int Ele = 0; Ele < NUME; Ele++)  
                 {   
                     CElement& Element = ElementGrp[Ele]; //CElement
-                    CTet4& Tet4Element = dynamic_cast<CTet4&>(Element); //turn to CT3
+                    CTet4& Tet4Element = dynamic_cast<CTet4&>(Element); //turn to Tet4
                     //std::cout<<size<<endl;
                     
                     unsigned int size = 12;

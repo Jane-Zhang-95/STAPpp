@@ -167,7 +167,6 @@ void CT3::NmatElast2D(double* Nmat, C2DMaterial* material_)
 }
 
 //	Calculate element stiffness matrix 
-//	Upper triangular matrix, stored as an array column by colum starting from the diagonal element
 void CT3::ElementStiffness(double* Matrix)
 {
 	clear(Matrix, SizeOfStiffnessMatrix()); 
@@ -187,7 +186,7 @@ void CT3::ElementStiffness(double* Matrix)
 	for(unsigned int i=0 ; i<36; i++){
 		M[i]=0;}
 
-	for(unsigned int i=0; i<6; i++){//column
+	for(unsigned int i=0; i<6; i++){ //column
 		for(unsigned int j=0; j<6; j++){
 			for(unsigned int i2 = 0; i2 < 3; i2++){
 				for(unsigned int j2 = 0; j2 < 3; j2++){
@@ -201,6 +200,7 @@ void CT3::ElementStiffness(double* Matrix)
 	for(unsigned int i=0 ; i<81; i++){
 		newM[i]=0;}
 
+	// turn 2d to 3d
     unsigned int rowMap[] = {0, 1, 3, 4, 6, 7}; 
 
     for (unsigned int i = 0; i < 6; i++) {
@@ -268,6 +268,7 @@ void CT3::ElementStress(double* stress, double* Displacement)
 	} //DB
 	//std::cout<<s[0]<<s[1]<<s[2]<<s[3]<<s[4]<<s[5]<<s[6]<<endl;
 	//stress = new double[3];
+	// turn 2d to 3d
 	unsigned int rowMap[] = {0, 1, 3, 4, 6, 7}; 
 
     for (unsigned int i = 0; i < 3; i++) {
@@ -286,6 +287,65 @@ void CT3::ElementStress(double* stress, double* Displacement)
 			}
 		}
 	} //DBd
+
+}
+
+void CT3::GetError(double* stress, double* Displacement, double* L2_error, double* EN_error){
+	
+
+	// For error calculating
+	C2DMaterial* material_ = dynamic_cast<C2DMaterial*>(ElementMaterial_);
+	double node0[2]={0,0};  
+	double node1[2]={0,0};
+	double node2[2]={0,0};	
+
+	node0[0] = nodes_[0]->XYZ[0];
+	node1[0] = nodes_[1]->XYZ[0];
+	node2[0] = nodes_[2]->XYZ[0];
+	node0[1] = nodes_[0]->XYZ[1];
+	node1[1] = nodes_[1]->XYZ[1];
+	node2[1] = nodes_[2]->XYZ[1];
+
+	double Exact_1 = (-1)*(node0[0]+9)*(node0[0]+9)*(3*10-(node0[0]+9))/(6*(material_->E)/12);
+	double Exact_2 = (-1)*(node1[0]+9)*(node1[0]+9)*(3*10-(node1[0]+9))/(6*(material_->E)/12);
+	double Exact_3 = (-1)*(node2[0]+9)*(node2[0]+9)*(3*10-(node2[0]+9))/(6*(material_->E)/12);
+
+	double error_1x(0),error_2x(0),error_3x(0),error_1y(0),error_2y(0),error_3y(0);
+	//std::cout<<LocationMatrix_[0]<<LocationMatrix_[3]<<endl;
+
+	if (LocationMatrix_[1]){
+		error_1y = Exact_1 - Displacement[LocationMatrix_[1]-1];}
+	if (LocationMatrix_[4]){
+		error_2y = Exact_2 - Displacement[LocationMatrix_[4]-1];}
+	if (LocationMatrix_[7]){
+		error_3y = Exact_3 - Displacement[LocationMatrix_[7]-1];}
+	if (LocationMatrix_[0]){
+		error_1x = Displacement[LocationMatrix_[0]-1];}
+	if (LocationMatrix_[3]){
+		error_2x = Displacement[LocationMatrix_[3]-1];}
+	if (LocationMatrix_[6]){
+		error_3x = Displacement[LocationMatrix_[6]-1];}
+	//std::cout<<error_1x<<error_2x<<endl;
+	double errory = (error_1y + error_2y + error_3y)/3.0;
+	double errorx = (error_1x + error_2x + error_3x)/3.0;
+
+	L2_error[0] += (material_->Area)*(errory*errory + errorx*errorx);
+	//std::cout<<" "<<errorx<<" "<<errory<<endl;
+
+	//sigma exact
+	//double point_y = (node0[1]+node1[1]+node2[1])/3;
+	//double point_x = (node0[0]+node1[0]+node2[0])/3;
+
+	//double ex_s = (1)*(10-(point_x+9))*(point_y+0.15)*12;
+	//std::cout<<ex_s<<endl;
+	//double ex_s = (Exact_1s + Exact_2s + Exact_3s)/3.0;
+	//double error_s11 = ex_s - stress[0];
+	//std::cout<<point_x+9<< " " << point_y+0.15<<endl;
+	//std::cout<<Exact_1<<" "<<Exact_2<<endl;
+	//std::cout<<error<<L2_error[0]<<endl;
+
+	//EN_error[0] += (material_->Area)*(error_s11*error_s11);
+	//printf("1");
 }
 
 

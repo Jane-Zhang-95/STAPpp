@@ -98,8 +98,8 @@ void COutputter::OutputNodeInfo()
 		  << endl;
 
 	*this << " N O D A L   P O I N T   D A T A" << endl << endl;
-	*this << "    NODE       BOUNDARY                         NODAL POINT" << endl
-		  << "   NUMBER  CONDITION  CODES                     COORDINATES" << endl;
+	*this << "    NODE       BOUNDARY                         NODAL POINT                                      BODY" << endl
+		  << "   NUMBER  CONDITION  CODES                     COORDINATES                                      FORCE" << endl;
 
 	for (unsigned int np = 0; np < NUMNP; np++)
 		NodeList[np].Write(*this);
@@ -153,7 +153,7 @@ void COutputter::OutputElementInfo()
 			  << "     EQ.2, Q4 ELEMENTS" << endl
 			  << "     EQ.3, T3 ELEMENTS" << endl
 			  << "     EQ.4, H8 ELEMENTS" << endl
-			  << "     EQ.4, Tet4 ELEMENTS" << endl
+			  << "     EQ.5, Tet4 ELEMENTS" << endl
 			  << endl;
 
 		*this << " NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =" << setw(5) << NUME
@@ -380,8 +380,8 @@ void COutputter::OutputLoadInfo()
 		*this << "     NUMBER OF CONCENTRATED LOADS . =" << setw(6) << LoadData->nloads << endl;
 		*this << "     NUMBER OF NATURAL BC . =" << setw(6) << LoadData->nnbc << endl
 			  << endl;
-		*this << "    NODE          DIRECTION         LOAD            ELEMENT" << endl
-			  << "   NUMBER                         MAGNITUDE         NUMBER" << endl;
+		*this << "    NODE     DIRECTION              LOAD " << endl
+			  << "   NUMBER                         MAGNITUDE" << endl;
 
 		LoadData->Write(*this);
 
@@ -436,6 +436,10 @@ void COutputter::OutputElementStress()
 		
 		double stress_Bar = 0;
 		double* stress_T3 = new double[3];
+		double* L2_error = new double[1];
+		L2_error[0] = 0;
+		double* EN_error = new double[1];
+		EN_error[0] = 0;
   
 		switch (ElementType)  
 		{  
@@ -463,22 +467,28 @@ void COutputter::OutputElementStress()
 				break;  
 
 			case ElementTypes::T3: 
-				*this << "  ELEMENT            STRESS" << endl  
+				*this << "  ELEMENT                          STRESS" << endl  
 					<< "  NUMBER" << endl;  
   
+
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)  
 				{   
 					CElement& Element = EleGrp[Ele];  
   
-					Element.ElementStress(stress_T3, Displacement);  
+					Element.ElementStress(stress_T3, Displacement);
+
+					CT3& T3Element = dynamic_cast<CT3&>(Element);
+
+					T3Element.GetError(stress_T3, Displacement, L2_error, EN_error);
   
-					//CBarMaterial& material = *dynamic_cast<CBarMaterial*>(Element.GetElementMaterial());  
+					//CT3Material& material = *dynamic_cast<CT3Material*>(Element.GetElementMaterial());  
     
 					*this << setw(5) << Ele + 1 << setw(22) << stress_T3[0] << setw(18)
 						 << stress_T3[1] << setw(18) << stress_T3[2] << endl;  
 				}  
-  
-				*this << endl; 
+				std::cout<<endl;
+				std::cout<< "L2_error is: "<<L2_error[0] << endl;
+				*this  << endl; 
   
 				break; 
 
@@ -534,6 +544,8 @@ void COutputter::OutputElementStress()
 		}  
 		
 				delete[] stress_T3; 
+				delete[] L2_error;
+				delete[] EN_error;
 	}  
 }
 

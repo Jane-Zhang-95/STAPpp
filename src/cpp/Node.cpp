@@ -43,7 +43,8 @@ bool CNode::Read(ifstream& Input)
 void CNode::Write(COutputter& output)
 {
 	output << setw(9) << NodeNumber << setw(5) << bcode_[0] << setw(5) << bcode_[1] << setw(5) << bcode_[2]
-		   << setw(18) << XYZ[0] << setw(15) << XYZ[1] << setw(15) << XYZ[2] << endl;
+		   << setw(18) << XYZ[0] << setw(15) << XYZ[1] << setw(15) << XYZ[2] 
+		   << setw(18) << BODY[0] << setw(15) << BODY[1] << setw(15) << BODY[2] << endl;
 	
 }
 
