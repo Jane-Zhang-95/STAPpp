@@ -14,6 +14,9 @@
 
 #include "Element.h"
 #include "Bar.h"
+#include "T3.h"
+#include "Q4.h"
+#include "H8.h"
 #include "Material.h"
 #include "Node.h"
 
@@ -53,6 +56,7 @@ private:
 
     //! Number of material/section property sets in this group
     unsigned int NUMMAT_;
+
 
     //! Material list in this group
     CMaterial* MaterialList_;
@@ -94,4 +98,5 @@ public:
 
     //! Return the number of material/section property setss in this element group
     unsigned int GetNUMMAT() { return NUMMAT_; }
+
 };
