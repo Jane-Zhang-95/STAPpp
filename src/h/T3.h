@@ -47,7 +47,7 @@ public:
 //! N matrix
 	virtual void NmatElast2D(double* Nmat, C2DMaterial* material_);
 
-	virtual void GetError(double* stress, double* Displacement,double* L2_error, double* EN_error);
+	virtual void GetError(double* stress, double* Displacement,double* L2_error);
 
 //!	Calculate element stress
 	virtual void ElementStress(double* stress, double* Displacement);

@@ -438,8 +438,6 @@ void COutputter::OutputElementStress()
 		double* stress_T3 = new double[3];
 		double* L2_error = new double[1];
 		L2_error[0] = 0;
-		double* EN_error = new double[1];
-		EN_error[0] = 0;
   
 		switch (ElementType)  
 		{  
@@ -479,7 +477,7 @@ void COutputter::OutputElementStress()
 
 					CT3& T3Element = dynamic_cast<CT3&>(Element);
 
-					T3Element.GetError(stress_T3, Displacement, L2_error, EN_error);
+					T3Element.GetError(stress_T3, Displacement, L2_error);
   
 					//CT3Material& material = *dynamic_cast<CT3Material*>(Element.GetElementMaterial());  
     
@@ -545,7 +543,6 @@ void COutputter::OutputElementStress()
 		
 				delete[] stress_T3; 
 				delete[] L2_error;
-				delete[] EN_error;
 	}  
 }
 

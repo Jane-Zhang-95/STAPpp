@@ -290,7 +290,7 @@ void CT3::ElementStress(double* stress, double* Displacement)
 
 }
 
-void CT3::GetError(double* stress, double* Displacement, double* L2_error, double* EN_error){
+void CT3::GetError(double* stress, double* Displacement, double* L2_error){
 	
 
 	// For error calculating
