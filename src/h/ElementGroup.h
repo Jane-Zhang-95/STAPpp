@@ -16,6 +16,7 @@
 #include "Bar.h"
 #include "T3.h"
 #include "Q4.h"
+#include "H8.h"
 #include "Tet4.h"
 #include "Material.h"
 #include "Node.h"

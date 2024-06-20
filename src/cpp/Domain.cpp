@@ -14,6 +14,7 @@
 #include "gauss.h"
 #include "T3.h"
 #include "Q4.h"
+#include "H8.h"
 #include <math.h>
 
 using namespace std;
@@ -203,7 +204,7 @@ bool CDomain::ReadLoadCases()
 // Read element data 
 bool CDomain::ReadElements()  
 {  
-    EleGrpList = new CElementGroup[NUMEG];  
+    EleGrpList = new CElementGroup[NUMEG]; 
   
     for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)  
     {  
@@ -515,6 +516,18 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                 
                 break;
 
+            case ElementTypes::H8: 
+            
+            //force
+                for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)  
+                {   
+                    unsigned int dof = NodeList[LoadData->node_load[lnum] - 1].bcode_[LoadData->dof[lnum] - 1];  
+                    
+                    if(dof) // The DOF is activated  
+                        Force[dof - 1] += LoadData->load[lnum];  
+                }
+                break;
+
             case ElementTypes::Tet4: 
             //force
                 for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)  
@@ -523,6 +536,7 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                     
                     if(dof) // The DOF is activated  
                         Force[dof - 1] += LoadData->load[lnum];  
+
                     //std::cout<<Force[dof-1]<<endl;
                 }
             //body force

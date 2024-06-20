@@ -62,6 +62,9 @@ public:
 //! Output Q4 element data
 	void OutputQ4Elements(unsigned int EleGrp);
 
+//! Output H8 element data
+	void OutputH8Elements(unsigned int EleGrp);
+  
 //! Output Tet4 element data
 	void OutputTet4Elements(unsigned int EleGrp);
 

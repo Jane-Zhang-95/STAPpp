@@ -82,6 +82,7 @@ public:
 	virtual void Write(COutputter& output);
 };
 
+//! Material class for 3D plate element
 class C3DMaterial : public CMaterial
 {
 public:
