@@ -69,6 +69,10 @@ void CElementGroup::CalculateMemberSize()
             ElementSize_ = sizeof(CH8);
             MaterialSize_ = sizeof(C3DMaterial);
             break;
+        case ElementTypes::Tet4:
+            ElementSize_ = sizeof(CTet4);
+            MaterialSize_ = sizeof(C3DMaterial);
+            break;
         default:
             std::cerr << "Type " << ElementType_ << " not available. See CElementGroup::CalculateMemberSize." << std::endl;
             exit(5);
@@ -92,6 +96,8 @@ void CElementGroup::AllocateElements(std::size_t size)
             break;
         case ElementTypes::H8:
             ElementList_ = new CH8[size];
+        case ElementTypes::Tet4:
+            ElementList_ = new CTet4[size];
             break;
         default:
             std::cerr << "Type " << ElementType_ << " not available. See CElementGroup::AllocateElement." << std::endl;
@@ -114,6 +120,9 @@ void CElementGroup::AllocateMaterials(std::size_t size)
             MaterialList_ = new C2DMaterial[size];
             break;
         case ElementTypes::H8:
+            MaterialList_ = new C3DMaterial[size];
+            break;
+        case ElementTypes::Tet4:
             MaterialList_ = new C3DMaterial[size];
             break;
         default:

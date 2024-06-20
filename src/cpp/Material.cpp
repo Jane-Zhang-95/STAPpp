@@ -59,5 +59,5 @@ void C2DMaterial::Write(COutputter& output)
 
 void C3DMaterial::Write(COutputter& output)
 {
-	output << setw(16) << E << setw(16) << mu << endl;
+	output << setw(16) << E << setw(16) << mu << setw(16) << endl;
 }

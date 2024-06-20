@@ -204,17 +204,14 @@ bool CDomain::ReadLoadCases()
 // Read element data 
 bool CDomain::ReadElements()  
 {  
-    EleGrpList = new CElementGroup[NUMEG];  
-    printf("ok000");
+    EleGrpList = new CElementGroup[NUMEG]; 
   
     for (unsigned int EleGrp = 0; EleGrp < NUMEG; EleGrp++)  
-    { 
-        printf("ok111"); 
+    {  
         if (!EleGrpList[EleGrp].Read(Input))  
-            return false;
+            return false;  
     }
-    return true; 
-    printf("ok222"); 
+    return true;  
 }
 
 //	Calculate column heights
@@ -412,9 +409,14 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                     dof[6] = NodeList[Node2->NodeNumber - 1].bcode_[0];
                     dof[7] = NodeList[Node2->NodeNumber - 1].bcode_[1];
 
+                    CMaterial& Mat = ElementGrp.GetMaterial(grpnum);
+                    C2DMaterial& CT3mat = static_cast<C2DMaterial&>(Mat);
+                    double h = CT3mat.thickness;
+                    double Area = CT3mat.Area;
+
                     for( int i = 0; i<9 ; i++){
                         if(dof[i]) 
-                            Force[dof[i] - 1] += F[i]; 
+                            Force[dof[i] - 1] += (F[i])*Area*h/12; 
                     }
                     delete[] F;
                     F = nullptr;
@@ -431,7 +433,7 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                         Force[dof - 1] += LoadData->load[lnum];  
                 }
             //naturla bc
-                if(!(LoadData->EleGrp_num - grpnum - 1)){
+                if(!(LoadData->EleGrp_num - grpnum - 1)){ // searching group number
                     for (unsigned int lnum = 0; lnum < LoadData->nnbc; lnum++) //2 points at a time 
                     {  
                         unsigned int dof1 = NodeList[LoadData->node_nbc[2*lnum] - 1].bcode_[LoadData->dof_nbc[lnum] - 1];  //left
@@ -515,6 +517,7 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                 break;
 
             case ElementTypes::H8: 
+            
             //force
                 for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)  
                 {   
@@ -524,6 +527,62 @@ bool CDomain::AssembleForce(unsigned int LoadCase)
                         Force[dof - 1] += LoadData->load[lnum];  
                 }
                 break;
+
+            case ElementTypes::Tet4: 
+            //force
+                for (unsigned int lnum = 0; lnum < LoadData->nloads; lnum++)  
+                {   
+                    unsigned int dof = NodeList[LoadData->node_load[lnum] - 1].bcode_[LoadData->dof[lnum] - 1];  
+                    
+                    if(dof) // The DOF is activated  
+                        Force[dof - 1] += LoadData->load[lnum];  
+
+                    //std::cout<<Force[dof-1]<<endl;
+                }
+            //body force
+                for (unsigned int Ele = 0; Ele < NUME; Ele++)  
+                {   
+                    CElement& Element = ElementGrp[Ele]; //CElement
+                    CTet4& Tet4Element = dynamic_cast<CTet4&>(Element); //turn to Tet4
+                    //std::cout<<size<<endl;
+                    
+                    unsigned int size = 12;
+                    double* F = new double[size];
+                    Tet4Element.ElementForce(F); //for every element
+                    //std::cout<<F[0]<<F[1]<<endl;
+                    CNode** ElementNode = Element.GetNodes(); //4 points in element
+                    CNode* Node0 = ElementNode[0];//3 nodes
+                    CNode* Node1 = ElementNode[1];
+                    CNode* Node2 = ElementNode[2];
+                    CNode* Node3 = ElementNode[3];
+                    unsigned int dof[12] ={0};
+                    dof[0] = NodeList[Node0->NodeNumber - 1].bcode_[0]; //1x
+                    dof[1] = NodeList[Node0->NodeNumber - 1].bcode_[1]; 
+                    dof[2] = NodeList[Node0->NodeNumber - 1].bcode_[2];
+                    dof[3] = NodeList[Node1->NodeNumber - 1].bcode_[0]; 
+                    dof[4] = NodeList[Node1->NodeNumber - 1].bcode_[1];
+                    dof[5] = NodeList[Node1->NodeNumber - 1].bcode_[2]; 
+                    dof[6] = NodeList[Node2->NodeNumber - 1].bcode_[0];
+                    dof[7] = NodeList[Node2->NodeNumber - 1].bcode_[1];
+                    dof[8] = NodeList[Node2->NodeNumber - 1].bcode_[2];
+                    dof[9] = NodeList[Node3->NodeNumber - 1].bcode_[0];
+                    dof[10] = NodeList[Node3->NodeNumber - 1].bcode_[1];
+                    dof[11] = NodeList[Node3->NodeNumber - 1].bcode_[2];
+
+                    CMaterial& Mat = ElementGrp.GetMaterial(grpnum);
+                    C3DMaterial& CTet4mat = static_cast<C3DMaterial&>(Mat);
+                    double Area = CTet4mat.Area;
+
+                    for( int i = 0; i<12 ; i++){
+                        if(dof[i]) 
+                            Force[dof[i] - 1] += (F[i])*Area/20;
+                    }
+                    //std::cout<<Force[0]<<" "<<Force[1]<<" "<<Force[2]<<" "<<Force[3]<<endl;
+                    delete[] F;
+                    F = nullptr;
+                }
+            break;
+
 
             default: //error
                     std::cerr << "NDF Do not fit CNode::Read." << std::endl;

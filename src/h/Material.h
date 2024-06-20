@@ -87,9 +87,11 @@ class C3DMaterial : public CMaterial
 {
 public:
 
-	double mu;	//!< Poisson ratio
+	double mu;	//!< Poisson ratio, Thickness
 
 	double* D;
+
+	double Area;
 
 public:
 
