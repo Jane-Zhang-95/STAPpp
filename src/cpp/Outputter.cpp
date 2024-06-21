@@ -718,13 +718,13 @@ void COutputter::OutputElementStress()
 				for (unsigned int Ele = 0; Ele < NUME; Ele++)
 				{
 					CElement& Element = EleGrp[Ele];
-          Element.ElementStress(stress, Displacement);
+          				Element.ElementStress(stress, Displacement);
 
 					C3DMaterial& material = *dynamic_cast<C3DMaterial*>(Element.GetElementMaterial());
 					*this << setw(5) << Ele + 1 << setw(18) << stress[0] << setw(16) << stress[1] << setw(16) << stress[2]
 						<< setw(16) << stress[3] << setw(16) << stress[4] << setw(16) << stress[5] << endl;
-        }
-        *this << endl;
+        			}
+        			*this << endl;
 				break;
 
 			case ElementTypes::H8: // H8 element
@@ -757,10 +757,9 @@ void COutputter::OutputElementStress()
 					*this << setw(5) << Ele + 1 << " (+,+,+)" << setw(18) << Stress_H8[42] << setw(16) << Stress_H8[43] << setw(16) << Stress_H8[44]
 						<< setw(16) << Stress_H8[45] << setw(16) << Stress_H8[46] << setw(16) << Stress_H8[47] << endl;
 
-        }
-          *this << endl;
-
-				break;
+       				 	}
+          				*this << endl;
+					break;
 
 			default:   
 				cerr << "*** Error *** Elment type " << ElementType  
