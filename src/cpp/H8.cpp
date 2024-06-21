@@ -113,7 +113,8 @@ void CH8::ElementStiffness(double* Matrix)
 		
 		                double n[8][3] = {0};
 		
-		                n[0][0] = -1.0/8 * (1-p_j)*(1-p_k);
+		                // Calculate the gradient matrix in the derivation coordinates
+				n[0][0] = -1.0/8 * (1-p_j)*(1-p_k);
 		                n[0][1] = -1.0/8 * (1-p_i)*(1-p_k);
 		                n[0][2] = -1.0/8 * (1-p_i)*(1-p_j);
 		
@@ -154,7 +155,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (1-p_j)*(1+p_k)*(nodes_[5]->XYZ[0]) + 
 		                                    (1+p_j)*(1+p_k)*(nodes_[6]->XYZ[0]) + 
 		                                    (-1-p_j)*(1+p_k)*(nodes_[7]->XYZ[0]));
-		                // printf("J_11:%f\n",J_11);
 		                double J_12 = 1.0/8 * ((p_i-1)*(1-p_k)*(nodes_[0]->XYZ[0]) + 
 		                                    (1+p_i)*(p_k-1)*(nodes_[1]->XYZ[0]) + 
 		                                    (1+p_i)*(1-p_k)*(nodes_[2]->XYZ[0]) + 
@@ -163,7 +163,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (-1-p_i)*(1+p_k)*(nodes_[5]->XYZ[0]) + 
 		                                    (1+p_i)*(1+p_k)*(nodes_[6]->XYZ[0]) + 
 		                                    (1-p_i)*(1+p_k)*(nodes_[7]->XYZ[0]));
-		                // printf("J_12:%f\n",J_12);
 		                double J_13 = 1.0/8 * ((p_i-1)*(1-p_j)*(nodes_[0]->XYZ[0]) + 
 		                                    (1+p_i)*(p_j-1)*(nodes_[1]->XYZ[0]) + 
 		                                    (-1-p_i)*(1+p_j)*(nodes_[2]->XYZ[0]) + 
@@ -172,7 +171,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (1+p_i)*(1-p_j)*(nodes_[5]->XYZ[0]) + 
 		                                    (1+p_i)*(1+p_j)*(nodes_[6]->XYZ[0]) + 
 		                                    (1-p_i)*(1+p_j)*(nodes_[7]->XYZ[0]));
-		                // printf("J_13:%f\n",J_13);
 		                double J_21 = 1.0/8 * ((p_j-1)*(1-p_k)*(nodes_[0]->XYZ[1]) + 
 		                                    (1-p_j)*(1-p_k)*(nodes_[1]->XYZ[1]) + 
 		                                    (1+p_j)*(1-p_k)*(nodes_[2]->XYZ[1]) + 
@@ -181,7 +179,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (1-p_j)*(1+p_k)*(nodes_[5]->XYZ[1]) + 
 		                                    (1+p_j)*(1+p_k)*(nodes_[6]->XYZ[1]) + 
 		                                    (-1-p_j)*(1+p_k)*(nodes_[7]->XYZ[1]));
-		                // printf("J_21:%f\n",J_21);
 		                double J_22 = 1.0/8 * ((p_i-1)*(1-p_k)*(nodes_[0]->XYZ[1]) + 
 		                                    (1+p_i)*(p_k-1)*(nodes_[1]->XYZ[1]) + 
 		                                    (1+p_i)*(1-p_k)*(nodes_[2]->XYZ[1]) + 
@@ -190,7 +187,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (-1-p_i)*(1+p_k)*(nodes_[5]->XYZ[1]) + 
 		                                    (1+p_i)*(1+p_k)*(nodes_[6]->XYZ[1]) + 
 		                                    (1-p_i)*(1+p_k)*(nodes_[7]->XYZ[1]));
-		                // printf("J_22:%f\n",J_22);
 		                double J_23 = 1.0/8 * ((p_i-1)*(1-p_j)*(nodes_[0]->XYZ[1]) + 
 		                                    (1+p_i)*(p_j-1)*(nodes_[1]->XYZ[1]) + 
 		                                    (-1-p_i)*(1+p_j)*(nodes_[2]->XYZ[1]) + 
@@ -199,7 +195,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (1+p_i)*(1-p_j)*(nodes_[5]->XYZ[1]) + 
 		                                    (1+p_i)*(1+p_j)*(nodes_[6]->XYZ[1]) + 
 		                                    (1-p_i)*(1+p_j)*(nodes_[7]->XYZ[1]));
-		                // printf("J_23:%f\n",J_23);
 		                double J_31 = 1.0/8 * ((p_j-1)*(1-p_k)*(nodes_[0]->XYZ[2]) + 
 		                                    (1-p_j)*(1-p_k)*(nodes_[1]->XYZ[2]) + 
 		                                    (1+p_j)*(1-p_k)*(nodes_[2]->XYZ[2]) + 
@@ -208,7 +203,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (1-p_j)*(1+p_k)*(nodes_[5]->XYZ[2]) + 
 		                                    (1+p_j)*(1+p_k)*(nodes_[6]->XYZ[2]) + 
 		                                    (-1-p_j)*(1+p_k)*(nodes_[7]->XYZ[2]));
-		                // printf("J_31:%f\n",J_31);
 		                double J_32 = 1.0/8 * ((p_i-1)*(1-p_k)*(nodes_[0]->XYZ[2]) + 
 		                                    (1+p_i)*(p_k-1)*(nodes_[1]->XYZ[2]) + 
 		                                    (1+p_i)*(1-p_k)*(nodes_[2]->XYZ[2]) + 
@@ -217,7 +211,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (-1-p_i)*(1+p_k)*(nodes_[5]->XYZ[2]) + 
 		                                    (1+p_i)*(1+p_k)*(nodes_[6]->XYZ[2]) + 
 		                                    (1-p_i)*(1+p_k)*(nodes_[7]->XYZ[2]));
-		                // printf("J_32:%f\n",J_32);
 		                double J_33 = 1.0/8 * ((p_i-1)*(1-p_j)*(nodes_[0]->XYZ[2]) + 
 		                                    (1+p_i)*(p_j-1)*(nodes_[1]->XYZ[2]) + 
 		                                    (-1-p_i)*(1+p_j)*(nodes_[2]->XYZ[2]) + 
@@ -226,7 +219,6 @@ void CH8::ElementStiffness(double* Matrix)
 		                                    (1+p_i)*(1-p_j)*(nodes_[5]->XYZ[2]) + 
 		                                    (1+p_i)*(1+p_j)*(nodes_[6]->XYZ[2]) + 
 		                                    (1-p_i)*(1+p_j)*(nodes_[7]->XYZ[2]));
-		                // printf("J_33:%f\n",J_33);
 		                // double J[3][3] = {0};
 		                // for (unsigned int ii = 0; ii < 3; ++ii) {
 		                //     for (unsigned int jj = 0; jj < 3; ++jj) {
@@ -261,32 +253,32 @@ void CH8::ElementStiffness(double* Matrix)
 		                J_inv[2][2] = J_inv_33;
 		
 		                // Grad of shape function
-		                double N1_x = 1.0/8 * (J_inv_11 * (p_j-1)*(1-p_k) + J_inv_12 * (p_i-1)*(1-p_k) + J_inv_13 * (p_i-1)*(1-p_j));
-		                double N2_x = 1.0/8 * (J_inv_11 * (1-p_j)*(1-p_k) + J_inv_12 * (1+p_i)*(p_k-1) + J_inv_13 * (1+p_i)*(p_j-1));
-		                double N3_x = 1.0/8 * (J_inv_11 * (1+p_j)*(1-p_k) + J_inv_12 * (1+p_i)*(1-p_k) + J_inv_13 * (-1-p_i)*(1+p_j));
-		                double N4_x = 1.0/8 * (J_inv_11 * (1+p_j)*(p_k-1) + J_inv_12 * (1-p_i)*(1-p_k) + J_inv_13 * (p_i-1)*(1+p_j));
-		                double N5_x = 1.0/8 * (J_inv_11 * (p_j-1)*(1+p_k) + J_inv_12 * (p_i-1)*(1+p_k) + J_inv_13 * (1-p_i)*(1-p_j));
-		                double N6_x = 1.0/8 * (J_inv_11 * (1-p_j)*(1+p_k) + J_inv_12 * (-1-p_i)*(1+p_k) + J_inv_13 * (1+p_i)*(1-p_j));
-		                double N7_x = 1.0/8 * (J_inv_11 * (1+p_j)*(1+p_k) + J_inv_12 * (1+p_i)*(1+p_k) + J_inv_13 * (1+p_i)*(1+p_j));
-		                double N8_x = 1.0/8 * (J_inv_11 * (-1-p_j)*(1+p_k) + J_inv_12 * (1-p_i)*(1+p_k) + J_inv_13 * (1-p_i)*(1+p_j));
+		                // double N1_x = 1.0/8 * (J_inv_11 * (p_j-1)*(1-p_k) + J_inv_12 * (p_i-1)*(1-p_k) + J_inv_13 * (p_i-1)*(1-p_j));
+		                // double N2_x = 1.0/8 * (J_inv_11 * (1-p_j)*(1-p_k) + J_inv_12 * (1+p_i)*(p_k-1) + J_inv_13 * (1+p_i)*(p_j-1));
+		                // double N3_x = 1.0/8 * (J_inv_11 * (1+p_j)*(1-p_k) + J_inv_12 * (1+p_i)*(1-p_k) + J_inv_13 * (-1-p_i)*(1+p_j));
+		                // double N4_x = 1.0/8 * (J_inv_11 * (1+p_j)*(p_k-1) + J_inv_12 * (1-p_i)*(1-p_k) + J_inv_13 * (p_i-1)*(1+p_j));
+		                // double N5_x = 1.0/8 * (J_inv_11 * (p_j-1)*(1+p_k) + J_inv_12 * (p_i-1)*(1+p_k) + J_inv_13 * (1-p_i)*(1-p_j));
+		                // double N6_x = 1.0/8 * (J_inv_11 * (1-p_j)*(1+p_k) + J_inv_12 * (-1-p_i)*(1+p_k) + J_inv_13 * (1+p_i)*(1-p_j));
+		                // double N7_x = 1.0/8 * (J_inv_11 * (1+p_j)*(1+p_k) + J_inv_12 * (1+p_i)*(1+p_k) + J_inv_13 * (1+p_i)*(1+p_j));
+		                // double N8_x = 1.0/8 * (J_inv_11 * (-1-p_j)*(1+p_k) + J_inv_12 * (1-p_i)*(1+p_k) + J_inv_13 * (1-p_i)*(1+p_j));
 		
-		                double N1_y = 1.0/8 * (J_inv_21 * (p_j-1)*(1-p_k) + J_inv_22 * (p_i-1)*(1-p_k) + J_inv_23 * (p_i-1)*(1-p_j));
-		                double N2_y = 1.0/8 * (J_inv_21 * (1-p_j)*(1-p_k) + J_inv_22 * (1+p_i)*(p_k-1) + J_inv_23 * (1+p_i)*(p_j-1));
-		                double N3_y = 1.0/8 * (J_inv_21 * (1+p_j)*(1-p_k) + J_inv_22 * (1+p_i)*(1-p_k) + J_inv_23 * (-1-p_i)*(1+p_j));
-		                double N4_y = 1.0/8 * (J_inv_21 * (1+p_j)*(p_k-1) + J_inv_22 * (1-p_i)*(1-p_k) + J_inv_23 * (p_i-1)*(1+p_j));
-		                double N5_y = 1.0/8 * (J_inv_21 * (p_j-1)*(1+p_k) + J_inv_22 * (p_i-1)*(1+p_k) + J_inv_23 * (1-p_i)*(1-p_j));
-		                double N6_y = 1.0/8 * (J_inv_21 * (1-p_j)*(1+p_k) + J_inv_22 * (-1-p_i)*(1+p_k) + J_inv_23 * (1+p_i)*(1-p_j));
-		                double N7_y = 1.0/8 * (J_inv_21 * (1+p_j)*(1+p_k) + J_inv_22 * (1+p_i)*(1+p_k) + J_inv_23 * (1+p_i)*(1+p_j));
-		                double N8_y = 1.0/8 * (J_inv_21 * (-1-p_j)*(1+p_k) + J_inv_22 * (1-p_i)*(1+p_k) + J_inv_23 * (1-p_i)*(1+p_j));
+		                // double N1_y = 1.0/8 * (J_inv_21 * (p_j-1)*(1-p_k) + J_inv_22 * (p_i-1)*(1-p_k) + J_inv_23 * (p_i-1)*(1-p_j));
+		                // double N2_y = 1.0/8 * (J_inv_21 * (1-p_j)*(1-p_k) + J_inv_22 * (1+p_i)*(p_k-1) + J_inv_23 * (1+p_i)*(p_j-1));
+		                // double N3_y = 1.0/8 * (J_inv_21 * (1+p_j)*(1-p_k) + J_inv_22 * (1+p_i)*(1-p_k) + J_inv_23 * (-1-p_i)*(1+p_j));
+		                // double N4_y = 1.0/8 * (J_inv_21 * (1+p_j)*(p_k-1) + J_inv_22 * (1-p_i)*(1-p_k) + J_inv_23 * (p_i-1)*(1+p_j));
+		                // double N5_y = 1.0/8 * (J_inv_21 * (p_j-1)*(1+p_k) + J_inv_22 * (p_i-1)*(1+p_k) + J_inv_23 * (1-p_i)*(1-p_j));
+		                // double N6_y = 1.0/8 * (J_inv_21 * (1-p_j)*(1+p_k) + J_inv_22 * (-1-p_i)*(1+p_k) + J_inv_23 * (1+p_i)*(1-p_j));
+		                // double N7_y = 1.0/8 * (J_inv_21 * (1+p_j)*(1+p_k) + J_inv_22 * (1+p_i)*(1+p_k) + J_inv_23 * (1+p_i)*(1+p_j));
+		                // double N8_y = 1.0/8 * (J_inv_21 * (-1-p_j)*(1+p_k) + J_inv_22 * (1-p_i)*(1+p_k) + J_inv_23 * (1-p_i)*(1+p_j));
 		
-		                double N1_z = 1.0/8 * (J_inv_31 * (p_j-1)*(1-p_k) + J_inv_32 * (p_i-1)*(1-p_k) + J_inv_33 * (p_i-1)*(1-p_j));
-		                double N2_z = 1.0/8 * (J_inv_31 * (1-p_j)*(1-p_k) + J_inv_32 * (1+p_i)*(p_k-1) + J_inv_33 * (1+p_i)*(p_j-1));
-		                double N3_z = 1.0/8 * (J_inv_31 * (1+p_j)*(1-p_k) + J_inv_32 * (1+p_i)*(1-p_k) + J_inv_33 * (-1-p_i)*(1+p_j));
-		                double N4_z = 1.0/8 * (J_inv_31 * (1+p_j)*(p_k-1) + J_inv_32 * (1-p_i)*(1-p_k) + J_inv_33 * (p_i-1)*(1+p_j));
-		                double N5_z = 1.0/8 * (J_inv_31 * (p_j-1)*(1+p_k) + J_inv_32 * (p_i-1)*(1+p_k) + J_inv_33 * (1-p_i)*(1-p_j));
-		                double N6_z = 1.0/8 * (J_inv_31 * (1-p_j)*(1+p_k) + J_inv_32 * (-1-p_i)*(1+p_k) + J_inv_33 * (1+p_i)*(1-p_j));
-		                double N7_z = 1.0/8 * (J_inv_31 * (1+p_j)*(1+p_k) + J_inv_32 * (1+p_i)*(1+p_k) + J_inv_33 * (1+p_i)*(1+p_j));
-		                double N8_z = 1.0/8 * (J_inv_31 * (-1-p_j)*(1+p_k) + J_inv_32 * (1-p_i)*(1+p_k) + J_inv_33 * (1-p_i)*(1+p_j));
+		                // double N1_z = 1.0/8 * (J_inv_31 * (p_j-1)*(1-p_k) + J_inv_32 * (p_i-1)*(1-p_k) + J_inv_33 * (p_i-1)*(1-p_j));
+		                // double N2_z = 1.0/8 * (J_inv_31 * (1-p_j)*(1-p_k) + J_inv_32 * (1+p_i)*(p_k-1) + J_inv_33 * (1+p_i)*(p_j-1));
+		                // double N3_z = 1.0/8 * (J_inv_31 * (1+p_j)*(1-p_k) + J_inv_32 * (1+p_i)*(1-p_k) + J_inv_33 * (-1-p_i)*(1+p_j));
+		                // double N4_z = 1.0/8 * (J_inv_31 * (1+p_j)*(p_k-1) + J_inv_32 * (1-p_i)*(1-p_k) + J_inv_33 * (p_i-1)*(1+p_j));
+		                // double N5_z = 1.0/8 * (J_inv_31 * (p_j-1)*(1+p_k) + J_inv_32 * (p_i-1)*(1+p_k) + J_inv_33 * (1-p_i)*(1-p_j));
+		                // double N6_z = 1.0/8 * (J_inv_31 * (1-p_j)*(1+p_k) + J_inv_32 * (-1-p_i)*(1+p_k) + J_inv_33 * (1+p_i)*(1-p_j));
+		                // double N7_z = 1.0/8 * (J_inv_31 * (1+p_j)*(1+p_k) + J_inv_32 * (1+p_i)*(1+p_k) + J_inv_33 * (1+p_i)*(1+p_j));
+		                // double N8_z = 1.0/8 * (J_inv_31 * (-1-p_j)*(1+p_k) + J_inv_32 * (1-p_i)*(1+p_k) + J_inv_33 * (1-p_i)*(1+p_j));
 		
 				double N_xyz[8][3] = {0};
 		                for (unsigned int ii = 0; ii < 8; ++ii) {
@@ -297,6 +289,7 @@ void CH8::ElementStiffness(double* Matrix)
 		                    }
 		                }
 		
+				// B matrix
 				double B[6][24] = {0};
 		                for (unsigned int ii = 0; ii < 8; ++ii) {
 		                    B[0][0+3*ii] = N_xyz[ii][0];
@@ -320,7 +313,8 @@ void CH8::ElementStiffness(double* Matrix)
 		                    }
 		                }
 		
-		                for (unsigned int ii = 0; ii < 24; ++ii) {
+		                // K matrix
+				for (unsigned int ii = 0; ii < 24; ++ii) {
 		                    for (unsigned int jj = 0; jj < 24; ++jj) {
 		                        for (unsigned int kk = 0; kk < 6; ++kk) {
 		                            K[ii][jj] += w_i*w_j*w_k* BTD[ii][kk]*B[kk][jj] * det_J;
@@ -678,6 +672,7 @@ void CH8::ElementStiffness(double* Matrix)
             		}
 		}
 	}
+	// Stores the upper-right portion of K
 	unsigned s = 0;
     	for (unsigned int ii = 0; ii < 24; ++ii) {
         	for (int jj = ii; jj > -1; --jj) {
